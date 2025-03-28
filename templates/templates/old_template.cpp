@@ -5,15 +5,18 @@ using u32 = unsigned;
 using pii = std::pair<int,int>;
 constexpr int N = 1e5+5,M = 1e6+5,INF = 0x3f3f3f3f;
 #define pb emplace_back
-#define all(v) v.begin(),v.end()
+#define push_back emplace_back
 #define push emplace
+#define all(v) v.begin(),v.end()
 
 void solve(){
 	
 }
 
 int main(){
-	std::cin.tie(nullptr)->sync_with_stdio(false);
+	std::ios::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+	std::cout.tie(nullptr);
 	
 	int tt = 1;
 	// std::cin >> tt;
