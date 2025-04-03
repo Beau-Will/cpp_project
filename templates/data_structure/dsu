@@ -1,3 +1,9 @@
+#pragma once
+
+#include <iostream>
+#include <vector>
+#include <numeric>
+
 struct DSU {
     int _n;
     std::vector<int> _fa,_size;

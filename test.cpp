@@ -1,13 +1,8 @@
-#include <bits/stdc++.h>
-
-using i64 = long long;
+#include <iostream>
 
 int main(){
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-    std::cout.tie(nullptr);
-    
-    std::cout << "hello world\n";
+
+    std::cout << "hello world" << std::endl;
 
     return 0;
 }
