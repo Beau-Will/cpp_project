@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 
 using i64 = long long;
+using u32 = unsigned;
+using u64 = unsigned long long;
 
 constexpr int P1 = 1'000'000'007,P2 = 998'244'353;
 
@@ -50,58 +52,35 @@ struct ModInt {
     }
      
 };
-using mint = ModInt<P1>;
-using Z = ModInt<P2>;
+// using mint = ModInt<P1>;
+using Z = ModInt<P1>;
 
 void solve(){
-    int n;
-    std::cin >> n;
+    int n,V,cost;
+    std::cin >> n >> V >> cost;
 
-    // int fenzi = 0,fenmu = 0;
-    // auto dfs = [&](auto &&self,int u,int t){
+    std::vector<int> v(n+1);
+    for(int i = 1; i <= n; ++i){
+        std::cin >> v[i];
+    }
 
-    //     if(u<=0){
-    //         return;
-    //     }
-    //     if(t==1){
-    //         if(u<4){
-    //             ++fenmu;
-    //             ++fenzi;
-    //         }
-    //         self(self,u-4,t^1);
+    std::vector dp(V+1,std::vector<Z>(cost+1));
 
-    //         if(u==1){
-    //             ++fenmu;
-    //         }
-    //         self(self,u-1,t^1);
-    //     }else{
-    //         if(u==1){
-    //             ++fenzi;
-    //             ++fenmu;
-    //             self(self,u-1,t^1);
-    //         }
-    //         if(u==4){
-    //             ++fenzi;
-    //             ++fenmu;
-    //             self(self,u-4,t^1);
-    //         }
-    //         if(u%4==0){
-    //             self(self,u-4,t^1);
-    //         }else{
-    //             self(self,u-1,t^1);
-    //         }
+    dp[0][0] = 1;
+    for(int i = 1; i <= n; ++i){
+        for(int j = 1; j <= V; ++j){
+            for(int k = v[i]; k <= cost; ++k){
+                dp[j][k] += dp[j-1][k-v[i]];
+            }
+        }
+    }
 
-            
-    //         // self(self,u-1,t^1);
-    //         // if(u>=4){
-    //         //     self(self,u-4,t^1);
-    //         // }
-    //     }
-    // };
+    Z ans(0);
+    for(int i = 0; i <= cost; ++i){
+        ans += dp[V][i];
+    }
 
-    // dfs(dfs,n,1);
-
-    // std::cout << n << ":" << fenzi << "/" << fenmu << "\n";
+    std::cout << ans << "\n";
 }
 
 int main(){
@@ -109,28 +88,11 @@ int main(){
     std::cin.tie(nullptr);
     std::cout.tie(nullptr);
 
-    // std::cout << Z(102)*Z(103).inv() << "\n";
-    for(int i = 1; i <= 100000; ++i){
-        for(int j = i; j <= 100000; ++j){
-            if(j<i){
-                break;
-            }
-            // std::cout << "i/j:" << i << "/" << j << "\n";
-            Z t = Z(i)*Z(j).inv();
-            // std::cout << t << "\n";
-            if(t==239){
-                std::cout << "got it!\n";
-                std::cout << "i/j:" << i << "/" << j << "\n";
-                break;
-            }
-        }
-    }
-
     int t = 1;
-    // std::cin >> t;
-    // while(t--){
-    //     solve();
-    // }
+    std::cin >> t;
+    while(t--){
+        solve();
+    }
 
     return 0;
 }
