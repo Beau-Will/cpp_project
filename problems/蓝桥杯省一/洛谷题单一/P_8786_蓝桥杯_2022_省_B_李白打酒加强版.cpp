@@ -99,3 +99,41 @@ struct mod_int{
 
 using Z = mod_int<P1>;
 // using Z = mod_int<P2>;
+
+void solve(){
+    int n,m;
+    std::cin >> n >> m;
+
+    std::vector dp(n+m+1,std::vector<std::vector<Z>>(m+1,std::vector<Z>(101)));
+    dp[0][0][2] = 1;
+    for(int i = 0; i < n+m; ++i){
+        for(int j = 0; j < m; ++j){
+            for(int k = 0; k <= 100; ++k){
+                if(dp[i][j][k]!=0){
+                    if(k>0){
+                        dp[i+1][j+1][k-1] += dp[i][j][k];
+                    }
+                    if(k<=50){
+                        dp[i+1][j][k*2] += dp[i][j][k];
+                    }
+                }
+            }
+        }
+    }
+
+    std::cout << dp[n+m][m][0] << "\n";
+}
+
+int main(){
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+
+    int t = 1;
+    // std::cin >> t;
+    while(t--){
+        solve();
+    }
+
+    return 0;
+}
