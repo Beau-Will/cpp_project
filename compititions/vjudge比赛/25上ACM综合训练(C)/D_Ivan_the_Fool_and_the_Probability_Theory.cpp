@@ -16,6 +16,9 @@ struct mod_int{
     int get_value(){
         return _x;
     }
+    mod_int():_x(0){
+
+    }
     friend std::istream &operator >> (std::istream &is,mod_int &t){
         return is >> t._x;
     }
@@ -96,3 +99,72 @@ struct mod_int{
 
 using Z = mod_int<P1>;
 // using Z = mod_int<P2>;
+
+using Matrix = std::array<std::array<Z,3>,3>;
+
+void solve(){
+    i64 n,m;
+    std::cin >> n >> m;
+
+    auto mul = [&](Matrix &a,Matrix &b)->Matrix{
+        Matrix c;
+        for(int i = 1; i <= 2; ++i){
+            for(int j = 1; j <= 2; ++j){
+                c[i][j] = 0;
+            }
+        }
+        for(int i = 1; i <= 2; ++i){
+            for(int j = 1; j <= 2; ++j){
+                for(int k = 1; k <= 2; ++k){
+                    c[i][k] += a[i][j]*b[j][k];
+                }
+            }
+        }
+        return c;
+    };
+
+    auto quick_power = [&](Matrix a,i64 b)->Matrix{
+        Matrix res;
+        for(int i = 1; i <= 2; ++i){
+            for(int j = 1; j <= 2; ++j){
+                res[i][j] = 0;
+            }
+        }
+        for(int i = 1; i <= 2; ++i){
+            res[i][i] = 1;
+        }
+        for(;b;a = mul(a,a)){
+            if(b&1){
+                res = mul(res,a);
+            }
+            b >>= 1;
+        }
+        return res;
+    };
+
+    Matrix A1,B1;
+    B1[1][1] = B1[1][2] = B1[2][1] = 1,B1[2][2] = 0;
+    A1[1][1] = A1[2][1] = 1,A1[1][2] = A1[2][2] = 0;
+
+    auto Bn = quick_power(B1,n-1);
+    auto Bm = quick_power(B1,m-1);
+
+    auto An = mul(Bn,A1);
+    auto Am = mul(Bm,A1);
+
+    std::cout << (An[1][1]+Am[1][1]-1)*2 << "\n";
+}
+
+int main(){
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+
+    int t = 1;
+    // std::cin >> t;
+    while(t--){
+        solve();
+    }
+
+    return 0;
+}

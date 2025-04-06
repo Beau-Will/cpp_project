@@ -94,5 +94,58 @@ struct mod_int{
     }
 };
 
-using Z = mod_int<P1>;
-// using Z = mod_int<P2>;
+// using Z = mod_int<P1>;
+using Z = mod_int<P2>;
+
+void solve(){
+    int n,m,k,q;
+    std::cin >> n >> m >> k >> q;
+
+    int cnt = 0;
+    std::vector<std::pair<int,int>> queries(q);
+    for(int i = 0; i < q; ++i){
+        std::cin >> queries[i].first >> queries[i].second;
+    }
+
+    std::vector<bool> row(n+1),col(m+1);
+    int cnt_row = 0,cnt_col = 0;
+    for(int i = q-1; i >= 0; --i){
+        int &x = queries[i].first,&y = queries[i].second;
+        if(row[x]&&col[y]){
+            continue;
+        }
+        bool flag = false;
+        if(cnt_row == n || cnt_col == m){
+            flag = true;
+        }
+        if(!row[x]){
+            row[x] = true;
+            ++cnt_row;
+        }
+        if(!col[y]){
+            col[y] = true;
+            ++cnt_col;
+        }
+        if(flag){
+            continue;
+        }
+
+        ++cnt;
+    }
+
+    std::cout << Z(k).quick_power(cnt) << "\n";
+}
+
+int main(){
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+    std::cout.tie(nullptr);
+
+    int t = 1;
+    std::cin >> t;
+    while(t--){
+        solve();
+    }
+
+    return 0;
+}

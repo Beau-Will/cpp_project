@@ -52,4 +52,5 @@ struct ModInt {
     }
      
 };
-using mint = ModInt<P1>;
+using Z = ModInt<P1>;
+// using Z = ModInt<P2>;
