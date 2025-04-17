@@ -3,14 +3,21 @@
 using i64 = long long;
 using u32 = unsigned;
 using u64 = unsigned long long;
-using i128 = __int128;
 
 constexpr int inf1 = 1'000'000'000, P = 131;
 constexpr int P1 = 1'000'000'007, P2 = 998244353;
 constexpr i64 inf2 = 1'000'000'000'000'000'000;
 
 void solve() {
-  
+  int sum = 400;
+  int n;
+  std::cin >> n;
+
+  if (sum % n == 0) {
+    std::cout << sum / n << "\n";
+  } else {
+    std::cout << -1 << "\n";
+  }
 }
 
 int main() {
