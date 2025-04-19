@@ -9,7 +9,7 @@ constexpr int inf1 = 1'000'000'000, P = 131;
 constexpr int P1 = 1'000'000'007, P2 = 998244353;
 constexpr i64 inf2 = 1'000'000'000'000'000'000;
 
-#define all(v) v.begin(),v.end()
+#define all(v) (v.begin(),v.end())
 #define pb push_back
 #define fi first
 #define se second
@@ -208,7 +208,14 @@ struct Comb {
 */
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  if(n>=200&&n<=299){
+    std::cout << "Success\n";
+  }else{
+    std::cout << "Failure\n";
+  }
 }
 
 int main() {

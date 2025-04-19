@@ -9,7 +9,7 @@ constexpr int inf1 = 1'000'000'000, P = 131;
 constexpr int P1 = 1'000'000'007, P2 = 998244353;
 constexpr i64 inf2 = 1'000'000'000'000'000'000;
 
-#define all(v) v.begin(),v.end()
+#define all(v) (v.begin(),v.end())
 #define pb push_back
 #define fi first
 #define se second
@@ -208,7 +208,28 @@ struct Comb {
 */
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  bool is_login = false;
+
+  int ans = 0;
+
+  for(int i = 0; i < n; ++i){
+    std::string s;
+    std::cin >> s;
+    if(s=="login"){
+      is_login = true;
+    }else if(s=="logout"){
+      is_login = false;
+    }else if(s=="public"){
+
+    }else{
+      if(!is_login) ++ans;
+    }
+  }
+
+  std::cout << ans << "\n";
 }
 
 int main() {

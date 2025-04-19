@@ -208,7 +208,83 @@ struct Comb {
 */
 
 void solve() {
-  
+  int n,k;
+  std::cin >> n >> k;
+
+  std::string s;
+  std::cin >> s;
+
+  int cnto = 0;
+  for(int i = 0; i < n; ++i){
+    if(s[i]=='o'){
+      ++cnto;
+    }
+  }
+
+  std::string t = s;
+
+  for(int i = 0; i < n; ++i){
+    if(i>0){
+      if(t[i-1]=='o'&&t[i]=='?'){
+        t[i] = '.';
+      }
+    }
+    if(i<n-1){
+      if(t[i+1]=='o'&&t[i]=='?'){
+        t[i] = '.';
+      }
+    }
+  }
+  // std::cout << t << "\n";
+
+  std::vector<bool> vis(n);
+
+  int cnt = 0,sum = 0;
+  for(int i = 0; i < n; ++i){
+    if(t[i]=='?'){
+      ++sum;
+    }else{
+      if(sum%2==0&&sum!=0){
+        for(int j = i-sum; j <= i-1; ++j){
+          vis[j] = true;
+        }
+      }
+      cnt += (sum+1)/2;
+      sum = 0;
+    }
+  }
+  if(sum){
+    if(sum%2==0){
+      for(int j = n-sum; j <= n-1; ++j){
+        vis[j] = true;
+      }
+    }
+    cnt += (sum+1)/2;
+    sum = 0;
+  }
+
+  // std::cout << "cnto:" << cnto << "\n";
+  // std::cout << "cnt:" << cnt << "\n";
+  // std::cout << "isok:" << isok << "\n";
+
+  if(cnt==k-cnto){
+    // std::cout << "branch\n";
+    int tmp = 0;
+    std::vector<char> c = {'o','.'};
+    for(int i = 0; i < n; ++i){
+      if(vis[i]){
+        continue;
+      }
+      if(t[i]=='?'){
+        t[i] = c[tmp];
+        tmp ^= 1;
+      }else{
+        tmp = 0;
+      }
+    }
+  }
+
+  std::cout << t << "\n";
 }
 
 int main() {

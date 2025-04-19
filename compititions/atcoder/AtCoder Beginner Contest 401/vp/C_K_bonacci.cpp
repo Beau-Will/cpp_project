@@ -9,7 +9,7 @@ constexpr int inf1 = 1'000'000'000, P = 131;
 constexpr int P1 = 1'000'000'007, P2 = 998244353;
 constexpr i64 inf2 = 1'000'000'000'000'000'000;
 
-#define all(v) v.begin(),v.end()
+#define all(v) (v.begin(),v.end())
 #define pb push_back
 #define fi first
 #define se second
@@ -106,7 +106,8 @@ struct mod_int{
     }
 };
 
-using Z = mod_int<P1>;
+using Z = mod_int<inf1>;
+// using Z = mod_int<P1>;
 // using Z = mod_int<P2>;
 
 struct DSU {
@@ -208,7 +209,24 @@ struct Comb {
 */
 
 void solve() {
-  
+  int n,k;
+  std::cin >> n >> k;
+
+  std::vector<Z> a(n+1);
+  for(int i = 0; i < k; ++i){
+    if(i>n){
+      break;
+    }
+    a[i] = 1;
+  }
+
+  if(k<=n) a[k] = k;
+
+  for(int i = k+1; i <= n; ++i){
+    a[i] = a[i-1]+a[i-1]-a[i-1-k];
+  }
+
+  std::cout << a[n] << "\n";
 }
 
 int main() {
