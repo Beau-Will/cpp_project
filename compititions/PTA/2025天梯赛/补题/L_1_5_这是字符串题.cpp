@@ -16,7 +16,26 @@ constexpr i64 inf2 = 1'000'000'000'000'000'000;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  std::string s;
+  std::cin >> s;
+
+  std::vector<int> a(26);
+  for (int i = 0; i < 26; ++i) {
+    std::cin >> a[i];
+  }
+
+  std::vector<int> cnt(26);
+  int ans = 0;
+  for (auto &c : s) {
+    ++cnt[c - 'a'];
+    ans += a[c - 'a'];
+  }
+
+  for (int i = 0; i < 26; ++i) {
+    std::cout << cnt[i] << " \n"[i + 1 == 26];
+  }
+
+  std::cout << ans << "\n";
 }
 
 int main() {

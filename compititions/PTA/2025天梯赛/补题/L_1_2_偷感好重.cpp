@@ -16,7 +16,10 @@ constexpr i64 inf2 = 1'000'000'000'000'000'000;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  std::vector<int> a(3);
+  std::cin >> a[0] >> a[1] >> a[2];
+
+  std::cout << std::accumulate(a.begin(), a.end(), 0) << "\n";
 }
 
 int main() {

@@ -16,7 +16,33 @@ constexpr i64 inf2 = 1'000'000'000'000'000'000;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  std::string s;
+  std::cin >> s;
+
+  std::vector<char> stk1;
+  std::vector<std::string> stk2;
+
+  std::string tmp;
+  for (auto &c : s) {
+    if (c == '(') {
+      if (tmp != "") {
+        stk2.push_back(tmp);
+        tmp = "";
+      }
+      stk1.push_back(c);
+    } else if (c == ')') {
+      if (tmp != "") {
+        stk2.push_back(tmp);
+        tmp = "";
+      }
+      if (stk1.size()) {
+        std::cout << stk2.back() << "\n";
+        stk2.pop_back();
+      }
+    } else {
+      tmp += c;
+    }
+  }
 }
 
 int main() {

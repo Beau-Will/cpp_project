@@ -16,7 +16,8 @@ constexpr i64 inf2 = 1'000'000'000'000'000'000;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  std::cout << "Always code as if the guy who ends up maintaining your code "
+               "will be a violent psychopath who knows where you live.\n";
 }
 
 int main() {

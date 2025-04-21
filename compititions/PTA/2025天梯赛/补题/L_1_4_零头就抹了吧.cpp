@@ -16,7 +16,15 @@ constexpr i64 inf2 = 1'000'000'000'000'000'000;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  int t = 1;
+  while (t * 2 <= n) {
+    t *= 2;
+  }
+
+  std::cout << t << "\n";
 }
 
 int main() {

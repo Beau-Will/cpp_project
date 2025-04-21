@@ -16,7 +16,33 @@ constexpr i64 inf2 = 1'000'000'000'000'000'000;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  for (int i = 30; i >= 1; --i) {
+    i64 cur = 0;
+    for (int j = 1;; ++j) {
+      cur += std::pow(j, i);
+      if (cur > n) {
+        break;
+      }
+      if (cur == n) {
+        bool flag = false;
+        for (int k = 1; k <= j; ++k) {
+          if (!flag) {
+            std::cout << k << "^" << i;
+            flag = true;
+          } else {
+            std::cout << "+" << k << "^" << i;
+          }
+        }
+        std::cout << "\n";
+        return;
+      }
+    }
+  }
+
+  std::cout << "Impossible for " << n << ".\n";
 }
 
 int main() {

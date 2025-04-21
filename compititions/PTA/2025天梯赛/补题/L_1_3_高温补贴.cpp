@@ -16,7 +16,26 @@ constexpr i64 inf2 = 1'000'000'000'000'000'000;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  int T, S, t;
+  std::cin >> T >> S >> t;
+
+  if (T > 35 && S == 1 && t >= 33) {
+    std::cout << "Bu Tie\n";
+    std::cout << T << "\n";
+  } else {
+    if (S == 0) {
+      if (T <= 35 || t < 33) {
+        std::cout << "Shu Shi\n";
+        std::cout << t << "\n";
+      } else {
+        std::cout << "Shi Nei\n";
+        std::cout << T << "\n";
+      }
+    } else {
+      std::cout << "Bu Re\n";
+      std::cout << t << "\n";
+    }
+  }
 }
 
 int main() {
