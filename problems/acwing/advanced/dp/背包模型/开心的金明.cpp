@@ -8,7 +8,6 @@ using i128 = __int128;
 constexpr int inf1 = 1'000'000'000, P = 131;
 constexpr int P1 = 1'000'000'007, P2 = 998244353;
 constexpr i64 inf2 = 1'000'000'000'000'000'000;
-constexpr int inf3 = 0x3f3f3f3f;
 
 #define all(v) v.begin(), v.end()
 #define pb push_back
@@ -17,7 +16,22 @@ constexpr int inf3 = 0x3f3f3f3f;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  int m,n;
+  std::cin >> m >> n;
+
+  std::vector<int> a(n),b(n);
+  for(int i = 0; i < n; ++i){
+    std::cin >> a[i] >> b[i];
+  }
+
+  std::vector<int> dp(m+1);
+  for(int i = 0; i < n; ++i){
+    for(int j = m; j >= a[i]; --j){
+      dp[j] = std::max(dp[j],dp[j-a[i]]+a[i]*b[i]);
+    }
+  }
+
+  std::cout << dp[m] << "\n"; 
 }
 
 int main() {

@@ -17,7 +17,25 @@ constexpr int inf3 = 0x3f3f3f3f;
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
+  int n;
+  std::cin >> n;
   
+  std::vector<int> a(n+1);
+  for(int i = 1; i <= n; ++i){
+    std::cin >> a[i];
+  }
+
+  auto dp = std::vector(n+1,std::vector<int>(3,-inf1));
+
+  dp[0][2] = 0;
+
+  for(int i = 1; i <= n; ++i){
+    dp[i][0] = dp[i-1][1]+a[i];
+    dp[i][1] = std::max({dp[i-1][1],dp[i-1][2]-a[i]});
+    dp[i][2] = std::max(dp[i-1][2],dp[i-1][0]);
+  }
+
+  std::cout << (*std::max_element(all(dp[n]))) << "\n";
 }
 
 int main() {
