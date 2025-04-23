@@ -18,7 +18,19 @@ const double pi = std::acos(-1.0);
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  //[0,0] -> [233,666]
+  //[0,0] -> [x,y] -> [233,666]
+
+  // r = x = sqrt(x*x+y*y)
+  // α = arcsin(666/r)
+
+  double r = std::sqrt(233*233+666*666);
+
+  double res = r+std::asin(666.0/r)/(2*pi)*2*pi*r;
+
+  int ans = std::round(res);
+
+  std::cout << ans << "\n";
 }
 
 int main() {

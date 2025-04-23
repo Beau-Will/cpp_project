@@ -18,7 +18,33 @@ const double pi = std::acos(-1.0);
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  std::vector<int> a(n);
+  for(int i = 0; i < n; ++i){
+    std::cin >> a[i];
+  }
+
+  auto check = [&](int x){
+    for(int i = 1; i <= x/i; ++i){
+      if(x%i==0){
+        if(((i&1) ^ ((x/i)&1)) && (i>2 || (x/i)>2)){
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  int ans = 0;
+  for(int i = 0; i < n; ++i){
+    if(check(2*a[i])){
+      ++ans;
+    }
+  }
+
+  std::cout << ans << "\n";
 }
 
 int main() {

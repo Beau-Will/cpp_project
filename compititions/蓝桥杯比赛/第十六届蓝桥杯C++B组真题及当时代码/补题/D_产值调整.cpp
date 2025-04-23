@@ -18,7 +18,24 @@ const double pi = std::acos(-1.0);
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  int a,b,c,k;
+  std::cin >> a >> b >> c >> k;
+
+  for(;k--;){
+    int next_a = (b+c)/2;
+    int next_b = (a+c)/2;
+    int next_c = (a+b)/2;
+
+    a = next_a;
+    b = next_b;
+    c = next_c;
+
+    if(a==b&&a==c){
+      break;
+    }
+  }
+
+  std::cout << a << " " << b << " " << c << "\n";
 }
 
 int main() {
@@ -27,7 +44,7 @@ int main() {
   std::cout.tie(nullptr);
 
   int t = 1;
-  // std::cin >> t;
+  std::cin >> t;
   for (; t--;) {
     solve();
   }

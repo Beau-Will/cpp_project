@@ -18,7 +18,31 @@ const double pi = std::acos(-1.0);
 #define debug(x) std::cout << #x << ":" << x << "\n"
 
 void solve() {
-  
+  int n,m;
+  std::cin >> n >> m;
+
+  std::vector<int> a(n+1);
+  for(int i = 1; i <= n; ++i){
+    std::cin >> a[i];
+  }
+
+  std::sort(all(a));
+
+  i64 sum = 0;
+  for(int i = 1; i <= m-1; ++i){
+    sum += 1LL*a[i+1]*a[i+1]-1LL*a[i]*a[i];
+  }
+
+  i64 ans = std::min(inf2,sum);
+
+  for(int i = m+1; i <= n; ++i){
+    sum -= a[i-m+1]*a[i-m+1]-a[i-m]*a[i-m];
+    sum += a[i]*a[i]-a[i-1]*a[i-1];
+
+    ans = std::min(ans,sum);
+  }
+
+  std::cout << ans << "\n";
 }
 
 int main() {
