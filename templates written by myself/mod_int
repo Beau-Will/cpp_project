@@ -1,12 +1,5 @@
-#include <bits/stdc++.h>
-
-using i64 = long long;
-using u32 = unsigned;
-using u64 = unsigned long long;
-
-constexpr int P1 = 1000000007, P2 = 998244353;
-
-template <const int T> struct mod_int {
+template <const int T> 
+struct mod_int {
   const static int _mod = T;
   int _x;
 
@@ -71,7 +64,8 @@ template <const int T> struct mod_int {
     return mod_int(div % _mod);
   }
 
-  template <typename Q> mod_int quick_power(Q n) const {
+  template <typename Q> 
+  mod_int quick_power(Q n) const {
     mod_int res(1), a(_x);
     for (; n; a = a * a) {
       if (n & 1) {
@@ -81,7 +75,9 @@ template <const int T> struct mod_int {
     }
     return res;
   }
-  mod_int inv() const { return quick_power(_mod - 2); }
+  mod_int inv() const { 
+    return quick_power(_mod - 2);//_mod必须为质数，否则只能用exgcd求inv
+  }
 };
 
 using Z = mod_int<P1>;

@@ -1,0 +1,44 @@
+struct DSU {
+  int _n;
+  std::vector<int> _fa,_size;
+  
+  DSU(int n = 0){
+      init(n);
+  }
+
+  void init(int n) {
+    _n = n;
+    _fa.resize(_n);
+    std::iota(_fa.begin(),_fa.end(),0);
+    _size.assign(_n,1);
+  }
+
+  int find(int x) {
+    if(x!=_fa[x]) {
+      _fa[x] = find(_fa[x]);
+    }
+    return _fa[x];
+  }
+
+  bool same(int x,int y) {
+    return find(x)==find(y);
+  }
+
+  bool merge(int x,int y) {
+    int fx = find(x);
+    int fy = find(y);
+
+    if(fx != fy) {
+      if(_size[fx] > _size[fy]){
+        _size[fx] += _size[fy];
+        _fa[fy] = fx;
+      }else{
+        _size[fy] += _size[fx];
+        _fa[fx] = fy;
+      }
+
+      return true;
+    }
+    return false;
+  }
+};
