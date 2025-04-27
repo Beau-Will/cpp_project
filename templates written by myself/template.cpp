@@ -4,18 +4,21 @@ using i64 = long long;
 using u32 = unsigned;
 using u64 = unsigned long long;
 using i128 = __int128;
+using u128 = unsigned __int128;
+using d128 = long double;
 
-constexpr int inf1 = 1'000'000'000, P = 131;
-constexpr int P1 = 1'000'000'007, P2 = 998244353;
-constexpr i64 inf2 = 1'000'000'000'000'000'000;
-constexpr int inf3 = 0x3f3f3f3f;
+constexpr int inf1 = 1'000'000'000, P = 131;//P = 13331;
+constexpr int P1 = 1'000'000'007, P2 = 998'244'353;
+constexpr int inf2 = 0x3f3f3f3f;
+constexpr i64 inf3 = 1'000'000'000'000'000'000;
 const double pi = std::acos(-1.0);
 
 #define all(v) v.begin(), v.end()
-#define pb push_back
 #define fi first
 #define se second
-#define debug(x) std::cout << #x << ":" << x << "\n"
+
+std::mt19937 rnd1(std::chrono::steady_clock::now().time_since_epoch().count());
+std::mt19937_64 rnd2(std::chrono::steady_clock::now().time_since_epoch().count());
 
 void solve() {
   
@@ -26,10 +29,16 @@ int main() {
   std::cin.tie(nullptr);
   std::cout.tie(nullptr);
 
-  int t = 1;
-  // std::cin >> t;
-  for (; t--;) {
+  int _t = 1;
+  // std::cin >> _t;
+  for (; _t--;) {
+    // auto start = std::chrono::high_resolution_clock::now();
     solve();
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration =
+    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+    //         .count();
+    // std::cout << "耗时: " << duration << "毫秒" << std::endl;
   }
 
   return 0;
