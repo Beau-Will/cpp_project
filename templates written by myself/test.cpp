@@ -17,6 +17,9 @@ const double pi = std::acos(-1.0);
 #define fi first
 #define se second
 
+std::mt19937 rnd1(std::chrono::steady_clock::now().time_since_epoch().count());
+std::mt19937_64 rnd2(std::chrono::steady_clock::now().time_since_epoch().count());
+
 void solve() {
   
 }
@@ -29,7 +32,13 @@ int main() {
   int _t = 1;
   // std::cin >> _t;
   for (; _t--;) {
+    // auto start = std::chrono::high_resolution_clock::now();
     solve();
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration =
+    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+    //         .count();
+    // std::cout << "耗时: " << duration << "毫秒" << std::endl;
   }
 
   return 0;
