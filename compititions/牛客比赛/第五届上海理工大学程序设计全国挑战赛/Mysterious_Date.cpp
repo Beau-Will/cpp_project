@@ -17,8 +17,41 @@ const double pi = std::acos(-1.0);
 #define fi first
 #define se second
 
+struct Node{
+  int m1,d1,m2,d2;
+};
+
 void solve() {
-  
+  int n,M,D;
+  std::cin >> n >> M >> D;
+
+  std::vector<Node> a(n);
+  for(int i = 0; i < n; ++i){
+    std::cin >> a[i].m1 >> a[i].d1 >> a[i].m2 >> a[i].d2;
+  }
+
+  std::vector<int> d(M*D+5);
+  for(int i = 0; i < n; ++i){
+    ++d[(a[i].m1-1)*D+a[i].d1];
+    --d[(a[i].m2-1)*D+a[i].d2+1];
+  }
+
+  std::vector<int> x = d;
+  for(int i = 1; i <= M*D; ++i){
+    x[i] += x[i-1];
+  }
+  // for(int i = 1; i <= M*D; ++i){
+  //   std::cout << x[i] << " \n"[i%D==0];
+  // }
+
+  for(int i = 1; i <= M*D; ++i){
+    if(x[i]==0){
+      std::cout << (i/D+1) << " " << (i%D) << "\n";
+      return;
+    }
+  }
+
+  std::cout << "Online\n";
 }
 
 int main() {

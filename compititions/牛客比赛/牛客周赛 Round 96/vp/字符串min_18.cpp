@@ -18,7 +18,46 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
+  int n;
+  std::cin >> n;
+
+  std::string s;
+  std::cin >> s;
+
+  s = "0"+s+"1";
+
+  std::vector<int> c(n+2);
+  for(int i = 1; i <= n; ++i){
+    std::cin >> c[i];
+  }
   
+  std::vector<i64> suf(n+3);
+  for(int i = n+1; i > 0; --i){
+    suf[i] = suf[i+1];
+    if(s[i]!=s[i-1]){
+      suf[i] += c[i];
+    }
+  }
+
+  int cnt = 0;
+  i64 ans = inf3,pre = 0;
+  for(int i = 1; i <= n+1; ++i){
+    int u = (s[i]-'0')^cnt;
+    i64 cur = suf[i+1];
+
+    if(u==0){
+      cur += c[i];
+    }
+
+    ans = std::min(ans,cur+pre);
+
+    if(s[i]!=s[i-1]){
+      cnt ^= 1;
+      pre += c[i];
+    }
+  }
+
+  std::cout << ans << "\n";
 }
 
 int main() {
@@ -27,7 +66,7 @@ int main() {
   std::cout.tie(nullptr);
 
   int _t = 1;
-  // std::cin >> _t;
+  std::cin >> _t;
   for (; _t--;) {
     solve();
   }

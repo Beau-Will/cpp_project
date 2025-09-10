@@ -18,7 +18,36 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
+  int n,m;
+  std::cin >> n >> m;
+
+  std::vector<int> a(n+1),b(n+1);
+  for(int i = 1; i <= n; ++i){
+    std::cin >> a[i];
+  }
+  for(int i = 1; i <= n; ++i){
+    std::cin >> b[i];
+  }
+
+  std::vector<std::pair<int,int>> c(n+1);
+  for(int i = 1; i <= n; ++i){
+    if(b[i]>=a[i]){
+      c[i] = {b[i]-a[i],a[i]+m-b[i]};
+    }else{
+      c[i] = {b[i]+m-a[i],a[i]-b[i]};
+    }
+  }
+
+  std::sort(all(c));
+
+  int ans = inf1,x = 0;
+  for(int i = n; i >= 1; --i){
+    ans = std::min(ans,c[i].first+x);
+    x = std::max(x,c[i].second);
+  }
   
+  ans = std::min(ans,x);
+  std::cout << ans << "\n";
 }
 
 int main() {
@@ -27,7 +56,7 @@ int main() {
   std::cout.tie(nullptr);
 
   int _t = 1;
-  // std::cin >> _t;
+  std::cin >> _t;
   for (; _t--;) {
     solve();
   }

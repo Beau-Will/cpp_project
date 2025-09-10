@@ -1,8 +1,10 @@
 #include <bits/stdc++.h>
 
-int main(){
-    
-    std::cout << "hello world\n";
+using i64 = long long;
 
-    return 0;
+int main(){
+
+  std::cout << "It's airport test!\n";
+
+  return 0;
 }

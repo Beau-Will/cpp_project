@@ -18,7 +18,21 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  char a,b,c;
+  std::cin >> a >> b >> c;
+
+  std::map<char,int> cnt;
+  ++cnt[a];
+  ++cnt[b];
+  ++cnt[c];
+
+  for(const auto &[u,v]:cnt){
+    if(v>=2){
+      std::cout << "YES\n";
+      return;
+    }
+  }
+  std::cout << "NO\n";
 }
 
 int main() {

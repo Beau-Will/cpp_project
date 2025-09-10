@@ -18,7 +18,13 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  i64 x;
+  std::cin >> x;
+  if(x==1||x==4||x==7||x==9||x==10||x==12||x==13||x>14){
+    std::cout << "Yes\n";
+  }else{
+    std::cout << "No\n";
+  }
 }
 
 int main() {
@@ -27,7 +33,7 @@ int main() {
   std::cout.tie(nullptr);
 
   int _t = 1;
-  // std::cin >> _t;
+  std::cin >> _t;
   for (; _t--;) {
     solve();
   }

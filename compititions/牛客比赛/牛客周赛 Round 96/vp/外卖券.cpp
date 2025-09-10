@@ -18,7 +18,15 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  double x;
+  std::cin >> x;
+  if(x*0.8<x-5){
+    std::cout << 8 << "\n";
+  }else if(x*0.8>x-5){
+    std::cout << 5 << "\n";
+  }else{
+    std::cout << 0 << "\n";
+  }
 }
 
 int main() {

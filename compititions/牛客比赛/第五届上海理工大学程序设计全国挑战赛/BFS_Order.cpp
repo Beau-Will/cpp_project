@@ -18,7 +18,31 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  std::vector<int> p(n+1);
+  for(int i = 1; i <= n; ++i){
+    std::cin >> p[i];
+  }
+
+  //第i层从2^i到2^(i+1)-1
+  int cur = 0,num = 1,cnt = 0;
+  for(int i = 1; i <= n; ++i){
+    if(p[i]>=std::pow(2,cur) && p[i]<=std::pow(2,cur+1)-1){
+      ++cnt;
+      if(cnt==num){
+        num *= 2;
+        ++cur;
+        cnt = 0;
+      }
+    }else{
+      std::cout << "NO\n";
+      return;
+    }
+  }
+
+  std::cout << "YES\n";
 }
 
 int main() {
@@ -27,7 +51,7 @@ int main() {
   std::cout.tie(nullptr);
 
   int _t = 1;
-  // std::cin >> _t;
+  std::cin >> _t;
   for (; _t--;) {
     solve();
   }

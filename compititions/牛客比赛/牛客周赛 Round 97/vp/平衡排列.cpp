@@ -17,8 +17,41 @@ const double pi = std::acos(-1.0);
 #define fi first
 #define se second
 
+std::vector<bool> isok(100001);
+
 void solve() {
-  
+  i64 n;
+  std::cin >> n;
+
+  if(!isok[n]){
+    std::cout << "-1\n";
+    return;
+  }
+
+  i64 sum = (1+n)*n/2;
+  i64 half_sum = sum/2;
+  int last = n;
+
+  for(int i = n; i >= 1; --i){
+    if(half_sum<i){
+      break;
+    }
+    std::cout << i << " ";
+    half_sum -= i;
+    last = i;
+  }
+
+  if(half_sum!=0){
+    std::cout << half_sum << " ";
+  }
+
+  for(int i = 1; i < last; ++i){
+    if(i==half_sum){
+      continue;
+    }
+    std::cout << i << " ";
+  }
+  std::cout << "\n";
 }
 
 int main() {
@@ -26,8 +59,18 @@ int main() {
   std::cin.tie(nullptr);
   std::cout.tie(nullptr);
 
+  i64 s = 0;
+  for(int i = 1; i <= 100000; ++i){
+    s += i;
+    if(s&1){
+      isok[i] = false;
+    }else{
+      isok[i] = true;
+    }
+  }
+
   int _t = 1;
-  // std::cin >> _t;
+  std::cin >> _t;
   for (; _t--;) {
     solve();
   }

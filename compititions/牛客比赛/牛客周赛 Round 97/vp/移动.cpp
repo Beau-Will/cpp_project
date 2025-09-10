@@ -18,7 +18,44 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  int n,q;
+  std::cin >> n >> q;
+
+  std::string s;
+  std::cin >> s;
+
+  s = "?"+s;
+
+  std::vector<int> a;
+  for(int i = 1; i <= n; ++i){
+    if(s[i]=='#'){
+      a.push_back(i);
+    }
+  }
+
+  for(int qi = 0; qi < q; ++qi){
+    int x,y;
+    std::cin >> x >> y;
+    if(x>y){
+      std::swap(x,y);
+    }
+    
+    auto it1 = std::lower_bound(all(a),x);
+    if(it1==a.end()){
+      std::cout << "0\n";
+      continue;
+    }
+    int idx1 = a[it1-a.begin()];
+    
+    auto it2 = std::upper_bound(all(a),y);
+    if(it2==a.begin()){
+      std::cout << "0\n";
+      continue;
+    }
+    int idx2 = a[it2-a.begin()-1];
+
+    std::cout << std::max(0,idx2-idx1+1) << "\n";
+  }
 }
 
 int main() {

@@ -18,7 +18,18 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  int n,m,k;
+  std::cin >> n >> m >> k;
+
+  std::vector<int> a(n);
+  for(int i = 0; i < n; ++i){
+    std::cin >> a[i];
+    a[i] = std::abs(k-a[i]);
+  }
+
+  std::sort(all(a));
+
+  std::cout << a[m-1] << "\n";
 }
 
 int main() {
@@ -27,7 +38,7 @@ int main() {
   std::cout.tie(nullptr);
 
   int _t = 1;
-  // std::cin >> _t;
+  std::cin >> _t;
   for (; _t--;) {
     solve();
   }

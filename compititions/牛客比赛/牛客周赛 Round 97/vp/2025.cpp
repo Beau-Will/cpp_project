@@ -18,7 +18,22 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  std::string y;
+  std::cin >> y;
+
+  i64 ans = 1;
+  for(const auto &c:y){
+    ans *= (c^48);
+  }
+
+  for(i64 i = 0; i < 100000; ++i){
+    if(ans==i*i){
+      std::cout << "YES\n";
+      return;
+    }
+  }
+
+  std::cout << "NO\n";
 }
 
 int main() {

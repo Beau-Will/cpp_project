@@ -18,7 +18,38 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  int n,m,sx,sy;
+  std::cin >> n >> m >> sx >> sy;
+
+  int ans = 0;
+
+  auto vis = std::vector(n,std::vector<bool>(m));
+
+  std::vector<int> dx = {-2,-1,1,2,2,1,-1,-2};
+  std::vector<int> dy = {1,2,2,1,-1,-2,-2,-1};
+
+  auto dfs = [&](auto &&self,int x,int y,int cnt)->void {
+    if(cnt==n*m){
+      ++ans;
+      return;
+    }
+    
+    vis[x][y] = true;
+
+    for(int i = 0; i < dx.size(); ++i){
+      int u = x+dx[i],v = y+dy[i];
+      if(u<0||u>=n||v<0||v>=m||vis[u][v]){
+        continue;
+      }
+      self(self,u,v,cnt+1);
+    }
+
+    vis[x][y] = false;
+  };
+
+  dfs(dfs,sx,sy,1);
+
+  std::cout << ans << "\n";
 }
 
 int main() {
@@ -27,7 +58,7 @@ int main() {
   std::cout.tie(nullptr);
 
   int _t = 1;
-  // std::cin >> _t;
+  std::cin >> _t;
   for (; _t--;) {
     solve();
   }

@@ -18,7 +18,19 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  int ans = 0;
+  std::vector<std::string> a(n);
+  for(int i = 0; i < n; ++i){
+    std::cin >> a[i];
+    if(a[i][0]=='M' and a[i][1]=='c'){
+      ++ans;
+    }
+  }
+
+  std::cout << ans << "\n";
 }
 
 int main() {

@@ -18,7 +18,39 @@ const double pi = std::acos(-1.0);
 #define se second
 
 void solve() {
-  
+  int n;
+  std::cin >> n;
+
+  std::string s;
+  std::cin >> s;
+  s = "?"+s;
+
+  int diff = 0,idx = -1;
+  for(int i = 1; i <= n; ++i){
+    if(s[i]!='z'){
+      idx = i;
+      diff = 'z'-s[i];
+      break;
+    }
+  }
+
+  if(idx==-1){
+    std::cout << s.substr(1) << "\n";
+    return;
+  }
+
+  int j = idx+1;
+  for(; j <= n; ++j){
+    if(s[j]>s[idx]){
+      break;
+    }
+  }
+
+  for(int i = idx; i < j; ++i){
+    s[i] += diff;
+  }
+
+  std::cout << s.substr(1) << "\n";
 }
 
 int main() {
