@@ -70,6 +70,7 @@ struct Fenwick{
         r = mid-1;
       }
     }
+    return l;
   }
 
   void resize(int n){
