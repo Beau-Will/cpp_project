@@ -1,0 +1,57 @@
+//小根堆
+template <typename T = int>
+struct heap{
+  int siz;
+  std::vector<T> _heap;
+
+  void down(int u){
+    int t = u;
+    while(true){
+      int left = t*2,right = t*2+1;
+      if(left<=siz && _heap[left]<_heap[t]) t = left;
+      if(right<=siz && _heap[right]<_heap[t]) t = right;
+
+      if(t == u) break;
+
+      std::swap(_heap[t],_heap[u]);
+      u = t;
+    }
+  }
+
+  void up(int u){
+    while(u>1){
+      int father = u/2;
+
+      if(_heap[father] <= _heap[u]) break;
+      std::swap(_heap[father],_heap[u]);
+      u = father;
+    }
+  }
+
+  heap(std::vector<int> &v){
+    siz = v.size();
+    _heap.resize(siz+1);
+    for(int i = 0; i < v.size(); i++){
+      _heap[i+1] = v[i];
+    }
+    for(int i = siz/2; i; i--){
+      down(i);
+    }
+  }
+
+  void push(T x){
+    _heap[++siz] = x;
+    up(siz);
+  }
+
+  T pop(){
+    T top = _heap[1];
+    std::swap(_heap[1],_heap[siz--]);
+    down(1);
+    return top;
+  }
+
+  int size(){
+    return siz;
+  }
+};
