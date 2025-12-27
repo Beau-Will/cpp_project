@@ -1,0 +1,71 @@
+template <class Node>
+struct SGT{
+  int n;
+  std::vector<Node> node;
+
+  template<class T>
+  SGT(const std::vector<T> &init){
+    //init与SGT都是1base
+    n = init.size()-1;
+    node.assign((1+n)*4+1,Node());
+
+    std::function<void(int,int,int)> build = [&](int rt,int left,int right){
+      if(left == right){
+        node[rt] = init[left];
+        return;
+      }
+
+      int mid = left+(right-left)/2;
+      build(rt*2,left,mid);
+      build(rt*2+1,mid+1,right);
+
+      pushUp(rt);
+    };
+
+    build(1,1,n);
+  }
+
+  void pushUp(int rt){
+    node[rt] = node[rt*2]+node[rt*2+1];
+  }
+
+  void update(int rt,int left,int right,int pos,const Node& c){
+    if(left == right){
+      node[rt] = c;
+      return;
+    }
+
+    int mid = left+(right-left)/2;
+    if(pos<=mid){
+      update(rt*2,left,mid,pos,c);
+    }else{
+      update(rt*2+1,mid+1,right,pos,c);
+    }
+
+    pushUp(rt);
+  }
+
+  Node queryRange(int rt,int left,int right,int ql,int qr){
+    if(left==ql && right==qr){
+      return node[rt];
+    }
+
+    int mid = left+(right-left)/2;
+    if(qr<=mid){
+      return queryRange(rt*2,left,mid,ql,qr);
+    }else if(ql>mid){
+      return queryRange(rt*2+1,mid+1,right,ql,qr);
+    }else{
+      return queryRange(rt*2,left,mid,ql,mid)+queryRange(rt*2+1,mid+1,right,mid+1,qr);
+    }
+  }
+};
+
+struct Node{
+  int max,min;
+  Node operator + (const Node& t){
+    return {std::max(max,t.max),std::min(min,t.min)};
+  }
+};
+
+using SegmentTree = SGT<Node>;

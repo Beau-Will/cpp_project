@@ -1,10 +1,13 @@
-/**   懒标记线段树（LazySegmentTree）
- *    2023-03-03: https://atcoder.jp/contests/joi2023yo2/submissions/39363123
- *    2023-03-12: https://codeforces.com/contest/1804/submission/197106837
- *    2023-07-17: https://ac.nowcoder.com/acm/contest/view-submission?submissionId=62804432
- *    2023-11-12: https://qoj.ac/submission/249505
- *    2024-08-14:  https://ac.nowcoder.com/acm/contest/view-submission?submissionId=70980889&returnHomeType=1&uid=329687984
-**/
+#include <bits/stdc++.h>
+
+using i64 = long long;
+using u64 = unsigned long long;
+using i128 = __int128;
+
+constexpr int inf1 = 1E9,inf2 = 0x3f3f3f3f;
+constexpr int P1 = 1E9+7, P2 = 998'244'353;
+constexpr i64 inf = 2E18;
+
 template<class Info, class Tag>
 struct LazySegmentTree {
     int n;
@@ -206,19 +209,62 @@ struct LazySegmentTree {
 };
 
 struct Tag {
-    int x = 0;
+    i64 add = 0;
     void apply(const Tag &t) & {
-        x = std::max(x, t.x);
+        add += t.add;
     }
 };
 
 struct Info {
-    int x = 0;
+    i64 sum = 0;
+    i64 len = 0;
     void apply(const Tag &t) & {
-        x = std::max(x, t.x);
+        sum += t.add*len;
     }
 };
 
 Info operator+(const Info &a, const Info &b) {
-    return {std::max(a.x, b.x)};
+    return {a.sum+b.sum,a.len+b.len};
+}
+
+void solve() {
+  int n,q;
+  std::cin >> n >> q;
+  
+  std::vector<Info> a(n);
+  for(int i = 0; i < n; i++){
+    std::cin >> a[i].sum;
+    a[i].len = 1;
+  }
+
+  LazySegmentTree<Info,Tag> sgt(a);
+
+  for(int qi = 0; qi < q; qi++){
+    int op;
+    std::cin >> op;
+
+    int x,y;
+    std::cin >> x >> y;
+    x--;
+    if(op==1){
+      i64 k;
+      std::cin >> k;
+
+      sgt.rangeApply(x,y,{k});
+    }else{
+      std::cout << sgt.rangeQuery(x,y).sum << "\n";
+    }
+  }
+}
+
+int main() {
+  std::cin.tie(nullptr)->sync_with_stdio(false);
+
+  int T = 1;
+  // std::cin >> T;
+  for (; T--;) {
+    solve();
+  }
+
+  return 0;
 }

@@ -1,7 +1,3 @@
-using i64 = long long;
- 
-constexpr int N = 1e6 + 5, P = 1e9 + 7;
- 
 template<typename T>
 T power(T a, i64 b) {
     T ret = 1;

@@ -1,6 +1,6 @@
 /*
-注意这里的线段树大小至少要开成n+1，因为下标0不存储数据
-具体见Codeforces Round 991 (Div. 3)的F题
+  此线段树是0-base的，用于构造的init_数组也是0-base的
+  区间查询的区间[l,r)为左闭右开区间，也是0-base的
 */
 template<class Info>
 struct SegmentTree {
