@@ -8,7 +8,7 @@ constexpr int inf1 = 1E9,inf2 = 0x3f3f3f3f;
 constexpr int P1 = 1E9+7, P2 = 998'244'353;
 
 void solve() {
-  
+  std::cout << "NO\n";
 }
 
 int main() {
