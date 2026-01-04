@@ -7,7 +7,7 @@ int main(){
   std::cin.tie(nullptr);
   std::cout.tie(nullptr);
 
-  i64 n,T,S,s;
+  int n,T,S,s;
   std::cin >> n >> T >> S >> s;
 
   std::vector<int> c(n+1);
@@ -33,8 +33,8 @@ int main(){
   int last = -1;
   for(int i = 1; i <= n; i++){
     if(i < s){
-      std::cout << std::max(1LL,C[i]/T) << " \n"[i==n];
-      last = std::max(1LL,C[i]/T);
+      std::cout << std::max(1,C[i]/T) << " \n"[i==n];
+      last = std::max(1,C[i]/T);
     }else{
       int diff = C[i]-C[i-s+1];
       int t = diff/s;
@@ -42,8 +42,8 @@ int main(){
         std::cout << "*" << last+diff/(s*T) << " \n"[i==n];
         last = last+diff/(s*T);
       }else{
-        std::cout << std::max(1LL,C[i]/T) << " \n"[i==n];
-        last = std::max(1LL,C[i]/T);
+        std::cout << std::max(1,C[i]/T) << " \n"[i==n];
+        last = std::max(1,C[i]/T);
       }
     }
   }
