@@ -1,4 +1,12 @@
 CSDN主页：
 https://blog.csdn.net/Beau_Will
+牛客主页：
+https://www.nowcoder.com/users/742834770
+codeforces主页：
+https://codeforces.com/profile/BeauWill
+atcoder主页：
+https://atcoder.jp/users/BeauWill
+博客园主页：
+https://www.cnblogs.com/BeauWill
 掘金主页：
 https://juejin.cn/user/4373190133681754
