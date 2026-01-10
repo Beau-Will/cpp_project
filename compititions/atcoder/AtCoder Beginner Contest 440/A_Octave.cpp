@@ -7,7 +7,10 @@ constexpr i64 inf2 = 1E18;
 constexpr int P1 = 1E9+7, P2 = 998'244'353;
 
 void solve(){
-  
+  int x,y;
+  std::cin >> x >> y;
+
+  std::cout << x*(1<<y) << "\n";
 }
 
 int main(){
