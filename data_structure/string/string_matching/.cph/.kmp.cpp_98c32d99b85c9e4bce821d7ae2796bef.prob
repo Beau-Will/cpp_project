@@ -1,1 +1,0 @@
-{"name":"Local: kmp","url":"e:\\Apps\\vscode_project\\cpp_project\\data_structure\\string\\string_matching\\kmp.cpp","tests":[{"id":1760711379653,"input":"ababcabcacbab\nabcac","output":"1"}],"interactive":false,"memoryLimit":1024,"timeLimit":3000,"srcPath":"e:\\Apps\\vscode_project\\cpp_project\\data_structure\\string\\string_matching\\kmp.cpp","group":"local","local":true}
