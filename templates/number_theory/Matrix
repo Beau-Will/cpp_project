@@ -1,0 +1,594 @@
+// 全局枚举类型
+enum SolutionType {
+  NO_SOLUTION = 0,        // 无解
+  UNIQUE_SOLUTION = 1,    // 唯一解
+  INFINITE_SOLUTIONS = 2  // 无穷多解
+};
+
+template<typename T>
+struct Matrix {
+  std::vector<std::vector<T>> a;
+  int n, m;
+
+  // 默认构造函数
+  Matrix() : n(0), m(0) {}
+
+  // 构造 n×m 矩阵
+  Matrix(int n, int m) : n(n), m(m), a(n, std::vector<T>(m)) {}
+
+  // 从二维向量构造
+  Matrix(const std::vector<std::vector<T>>& mat) {
+    n = mat.size();
+    if (n > 0) {
+      m = mat[0].size();
+      a = mat;
+    } else {
+      m = 0;
+    }
+  }
+
+  // 构造 n×n 单位矩阵
+  static Matrix<T> identity(int n) {
+    Matrix<T> res(n, n);
+    for (int i = 0; i < n; i++) {
+      res.a[i][i] = T(1);
+    }
+    return res;
+  }
+
+  // ============ 基本运算符重载 ============
+
+  // 矩阵加法
+  Matrix<T> operator+(const Matrix<T>& other) const {
+    assert(n == other.n && m == other.m);
+    Matrix<T> res(n, m);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        res.a[i][j] = a[i][j] + other.a[i][j];
+      }
+    }
+    return res;
+  }
+
+  // 加法赋值
+  Matrix<T>& operator+=(const Matrix<T>& other) {
+    assert(n == other.n && m == other.m);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        a[i][j] += other.a[i][j];
+      }
+    }
+    return *this;
+  }
+
+  // 矩阵减法
+  Matrix<T> operator-(const Matrix<T>& other) const {
+    assert(n == other.n && m == other.m);
+    Matrix<T> res(n, m);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        res.a[i][j] = a[i][j] - other.a[i][j];
+      }
+    }
+    return res;
+  }
+
+  // 减法赋值
+  Matrix<T>& operator-=(const Matrix<T>& other) {
+    assert(n == other.n && m == other.m);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        a[i][j] -= other.a[i][j];
+      }
+    }
+    return *this;
+  }
+
+  // 矩阵乘法
+  Matrix<T> operator*(const Matrix<T>& other) const {
+    assert(m == other.n);
+    Matrix<T> res(n, other.m);
+    for (int i = 0; i < n; i++) {
+      for (int k = 0; k < m; k++) {
+        T aik = a[i][k];
+        if (aik != T(0)) {
+          for (int j = 0; j < other.m; j++) {
+            res.a[i][j] += aik * other.a[k][j];
+          }
+        }
+      }
+    }
+    return res;
+  }
+
+  // 乘法赋值
+  Matrix<T>& operator*=(const Matrix<T>& other) {
+    assert(m == other.n);
+    *this = (*this) * other;
+    return *this;
+  }
+
+  // 矩阵数乘
+  Matrix<T> operator*(const T& scalar) const {
+    Matrix<T> res(n, m);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        res.a[i][j] = a[i][j] * scalar;
+      }
+    }
+    return res;
+  }
+
+  // 数乘赋值
+  Matrix<T>& operator*=(const T& scalar) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        a[i][j] *= scalar;
+      }
+    }
+    return *this;
+  }
+
+  // 矩阵转置
+  Matrix<T> transpose() const {
+    Matrix<T> res(m, n);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        res.a[j][i] = a[i][j];
+      }
+    }
+    return res;
+  }
+
+  // 获取指定位置的元素
+  T& operator()(int i, int j) {
+    return a[i][j];
+  }
+
+  const T& operator()(int i, int j) const {
+    return a[i][j];
+  }
+
+  // 判断是否为方阵
+  bool is_square() const {
+    return n == m;
+  }
+
+  // 打印矩阵
+  void print(int width = 0) const {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < m; j++) {
+        std::cout << std::setw(width) << a[i][j] << " ";
+      }
+      std::cout << "\n";
+    }
+  }
+
+  // ============ 高斯消元与矩阵求逆 ============
+
+  // SolutionInfo结构体
+  struct SolutionInfo {
+    SolutionType type;
+    std::vector<T> solution;
+
+    SolutionInfo() : type(NO_SOLUTION) {}
+    SolutionInfo(SolutionType t, const std::vector<T>& s = {}) : type(t),
+      solution(s) {}
+  };
+
+  // 高斯消元求解，返回详细解信息
+  SolutionInfo gauss_solve_detailed(const std::vector<T>& b) const {
+    assert(is_square() && n == (int)b.size());
+
+    // 创建增广矩阵
+    Matrix<T> aug(n, n + 1);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        aug.a[i][j] = a[i][j];
+      }
+      aug.a[i][n] = b[i];
+    }
+
+    return aug.gauss_elimination_detailed();
+  }
+
+  // 详细的高斯消元函数
+  SolutionInfo gauss_elimination_detailed() const {
+    std::vector<std::vector<T>> mat = a;
+    int rows = n;
+    int cols = m;
+
+    if (cols != rows + 1) {
+      return SolutionInfo(NO_SOLUTION);
+    }
+
+    std::vector<int> where(cols - 1, -1);
+    int rank = 0;
+
+    // 主元消去
+    for (int col = 0, row = 0; col < cols - 1 && row < rows; col++) {
+      // 寻找主元
+      int sel = row;
+      for (int i = row; i < rows; i++) {
+        if (std::abs(mat[i][col]) > std::abs(mat[sel][col])) {
+          sel = i;
+        }
+      }
+
+      if (std::abs(mat[sel][col]) < 1e-10) {
+        continue;
+      }
+
+      // 交换行
+      std::swap(mat[sel], mat[row]);
+      where[col] = row;
+      rank++;
+
+      // 归一化
+      T inv_pivot = T(1) / mat[row][col];
+      for (int j = col; j < cols; j++) {
+        mat[row][j] *= inv_pivot;
+      }
+
+      // 消元
+      for (int i = 0; i < rows; i++) {
+        if (i != row && std::abs(mat[i][col]) > 1e-10) {
+          T factor = mat[i][col];
+          for (int j = col; j < cols; j++) {
+            mat[i][j] -= mat[row][j] * factor;
+          }
+        }
+      }
+
+      row++;
+    }
+
+    // 检查无解情况
+    for (int i = 0; i < rows; i++) {
+      bool all_zero = true;
+      for (int j = 0; j < cols - 1; j++) {
+        if (std::abs(mat[i][j]) > 1e-10) {
+          all_zero = false;
+          break;
+        }
+      }
+      if (all_zero && std::abs(mat[i][cols - 1]) > 1e-10) {
+        return SolutionInfo(NO_SOLUTION);
+      }
+    }
+
+    // 判断解的类型
+    int unknown_count = cols - 1;
+    std::vector<T> solution(unknown_count, T(0));
+
+    for (int i = 0; i < unknown_count; i++) {
+      if (where[i] != -1) {
+        solution[i] = mat[where[i]][cols - 1];
+      }
+    }
+
+    if (rank == unknown_count) {
+      return SolutionInfo(UNIQUE_SOLUTION, solution);
+    } else {
+      return SolutionInfo(INFINITE_SOLUTIONS, solution);
+    }
+  }
+
+  // 原有的简单接口（向后兼容）
+  std::vector<T> gauss_solve(const std::vector<T>& b) const {
+    SolutionInfo info = gauss_solve_detailed(b);
+    if (info.type == UNIQUE_SOLUTION) {
+      return info.solution;
+    }
+    return {};  // 无解或无穷多解返回空向量
+  }
+
+  // 判断函数
+  bool has_unique_solution(const std::vector<T>& b) const {
+    return gauss_solve_detailed(b).type == UNIQUE_SOLUTION;
+  }
+
+  bool has_no_solution(const std::vector<T>& b) const {
+    return gauss_solve_detailed(b).type == NO_SOLUTION;
+  }
+
+  bool has_infinite_solutions(const std::vector<T>& b) const {
+    return gauss_solve_detailed(b).type == INFINITE_SOLUTIONS;
+  }
+
+  // 计算行列式（仅限方阵）
+  T determinant() const {
+    assert(is_square());
+
+    std::vector<std::vector<T>> mat = a;
+    int n = this->n;
+    T det = T(1);
+
+    for (int i = 0; i < n; i++) {
+      // 寻找主元
+      int pivot = i;
+      for (int j = i + 1; j < n; j++) {
+        if (abs(mat[j][i]) > abs(mat[pivot][i])) {
+          pivot = j;
+        }
+      }
+
+      // 如果主元为0，行列式为0
+      if (abs(mat[pivot][i]) < 1e-10) {
+        return T(0);
+      }
+
+      // 交换行并改变行列式符号
+      if (pivot != i) {
+        std::swap(mat[i], mat[pivot]);
+        det = -det;
+      }
+
+      det *= mat[i][i];
+
+      // 消去下方元素
+      for (int j = i + 1; j < n; j++) {
+        T factor = mat[j][i] / mat[i][i];
+        for (int k = i + 1; k < n; k++) {
+          mat[j][k] -= factor * mat[i][k];
+        }
+      }
+    }
+
+    return det;
+  }
+
+  // 计算伴随矩阵（仅限方阵）
+  Matrix<T> adjugate() const {
+    assert(is_square());
+
+    int n = this->n;
+    Matrix<T> adj(n, n);
+
+    // 如果是一阶矩阵，伴随矩阵是[1]
+    if (n == 1) {
+      adj.a[0][0] = T(1);
+      return adj;
+    }
+
+    // 计算余子式矩阵的转置
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        // 创建子矩阵（去掉第i行第j列）
+        Matrix<T> submat(n - 1, n - 1);
+        int row_idx = 0;
+        for (int ii = 0; ii < n; ii++) {
+          if (ii == i) continue;
+          int col_idx = 0;
+          for (int jj = 0; jj < n; jj++) {
+            if (jj == j) continue;
+            submat.a[row_idx][col_idx] = a[ii][jj];
+            col_idx++;
+          }
+          row_idx++;
+        }
+
+        // 计算代数余子式：(-1)^(i+j) * det(submat)
+        T cofactor = submat.determinant();
+        if ((i + j) % 2 == 1) {
+          cofactor = -cofactor;
+        }
+
+        // 伴随矩阵是余子式矩阵的转置
+        adj.a[j][i] = cofactor;
+      }
+    }
+
+    return adj;
+  }
+
+  // 计算逆矩阵（仅限方阵）
+  // 返回逆矩阵，如果矩阵不可逆则返回空矩阵
+  Matrix<T> inverse() const {
+    assert(is_square());
+
+    int n = this->n;
+
+    // 方法1：通过伴随矩阵和行列式求逆（精度更高但复杂度O(n!)）
+    // 仅适用于小矩阵，对于n>4不实用
+
+    // 方法2：高斯-约旦消元法
+    // 创建增广矩阵 [A | I]
+    Matrix<T> aug(n, 2 * n);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        aug.a[i][j] = a[i][j];
+      }
+      aug.a[i][n + i] = T(1);
+    }
+
+    // 进行高斯-约旦消元
+    for (int i = 0; i < n; i++) {
+      // 寻找主元
+      int pivot = i;
+      for (int j = i + 1; j < n; j++) {
+        if (abs(aug.a[j][i]) > abs(aug.a[pivot][i])) {
+          pivot = j;
+        }
+      }
+
+      // 如果主元为0，矩阵不可逆
+      if (abs(aug.a[pivot][i]) < 1e-10) {
+        return Matrix<T>();  // 返回空矩阵
+      }
+
+      // 交换行
+      if (pivot != i) {
+        std::swap(aug.a[i], aug.a[pivot]);
+      }
+
+      // 将主元化为1
+      T inv_pivot = T(1) / aug.a[i][i];
+      for (int j = i; j < 2 * n; j++) {
+        aug.a[i][j] *= inv_pivot;
+      }
+
+      // 消去其他行的该列元素
+      for (int j = 0; j < n; j++) {
+        if (j != i && abs(aug.a[j][i]) > 1e-10) {
+          T factor = aug.a[j][i];
+          for (int k = i; k < 2 * n; k++) {
+            aug.a[j][k] -= aug.a[i][k] * factor;
+          }
+        }
+      }
+    }
+
+    // 提取逆矩阵部分
+    Matrix<T> inv(n, n);
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        inv.a[i][j] = aug.a[i][n + j];
+      }
+    }
+
+    return inv;
+  }
+
+  // 计算矩阵的秩
+  int rank() const {
+    std::vector<std::vector<T>> mat = a;
+    int rows = n, cols = m;
+    int rank = 0;
+
+    std::vector<bool> row_selected(rows, false);
+
+    for (int col = 0; col < cols; col++) {
+      // 寻找主元
+      int pivot = -1;
+      for (int row = 0; row < rows; row++) {
+        if (!row_selected[row] && abs(mat[row][col]) > 1e-10) {
+          pivot = row;
+          break;
+        }
+      }
+
+      if (pivot == -1) continue;
+
+      rank++;
+      row_selected[pivot] = true;
+
+      // 归一化主元行
+      T inv_pivot = T(1) / mat[pivot][col];
+      for (int j = col; j < cols; j++) {
+        mat[pivot][j] *= inv_pivot;
+      }
+
+      // 消去其他行的该列元素
+      for (int row = 0; row < rows; row++) {
+        if (row != pivot && abs(mat[row][col]) > 1e-10) {
+          T factor = mat[row][col];
+          for (int j = col; j < cols; j++) {
+            mat[row][j] -= mat[pivot][j] * factor;
+          }
+        }
+      }
+    }
+
+    return rank;
+  }
+
+  // ============ 其他实用函数 ============
+
+  // 获取矩阵大小
+  std::pair<int, int> size() const {
+    return {n, m};
+  }
+
+  // 检查矩阵是否是对称矩阵
+  bool is_symmetric() const {
+    if (!is_square()) return false;
+
+    for (int i = 0; i < n; i++) {
+      for (int j = i + 1; j < n; j++) {
+        if (abs(a[i][j] - a[j][i]) > 1e-10) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+};
+
+// ============ 全局运算符 ============
+
+// 左乘标量
+template<typename T>
+Matrix<T> operator*(const T& scalar, const Matrix<T>& mat) {
+  return mat * scalar;
+}
+
+// 流输出操作符
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const Matrix<T>& mat) {
+  for (int i = 0; i < mat.n; i++) {
+    for (int j = 0; j < mat.m; j++) {
+      os << mat.a[i][j] << " ";
+    }
+    if (i != mat.n - 1) os << "\n";
+  }
+  return os;
+}
+
+// ============ 快速幂函数 ============
+
+template<typename T>
+Matrix<T> matrix_pow(Matrix<T> base, long long power) {
+  assert(base.is_square());  // 只有方阵才能求幂
+
+  int n = base.n;
+  Matrix<T> result = Matrix<T>::identity(n);
+
+  while (power > 0) {
+    if (power & 1) {
+      result = result * base;  // 使用矩阵乘法
+    }
+    base = base * base;          // 使用矩阵乘法
+    power >>= 1;
+  }
+  return result;
+}
+
+// 带模数的矩阵快速幂（适用于整数类型）
+template<typename T>
+Matrix<T> matrix_pow_mod(Matrix<T> base, long long power, T mod) {
+  static_assert(std::is_integral<T>::value, "模运算只支持整数类型");
+
+  assert(base.is_square());
+
+  int n = base.n;
+  Matrix<T> result = Matrix<T>::identity(n);
+
+  // 对单位矩阵取模
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      result.a[i][j] %= mod;
+    }
+  }
+
+  while (power > 0) {
+    if (power & 1) {
+      result = result * base;
+      // 对结果取模
+      for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+          result.a[i][j] %= mod;
+        }
+      }
+    }
+    base = base * base;
+    // 对底数取模
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        base.a[i][j] %= mod;
+      }
+    }
+    power >>= 1;
+  }
+  return result;
+}

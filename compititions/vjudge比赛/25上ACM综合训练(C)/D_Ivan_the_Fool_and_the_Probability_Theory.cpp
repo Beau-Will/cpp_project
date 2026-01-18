@@ -106,7 +106,7 @@ void solve(){
     i64 n,m;
     std::cin >> n >> m;
 
-    auto mul = [&](Matrix &a,Matrix &b)->Matrix{
+    auto mul = [&](Matrix &a,Matrix &b)->Matrix {
         Matrix c;
         for(int i = 1; i <= 2; ++i){
             for(int j = 1; j <= 2; ++j){
@@ -123,7 +123,7 @@ void solve(){
         return c;
     };
 
-    auto quick_power = [&](Matrix a,i64 b)->Matrix{
+    auto quick_power = [&](Matrix a,i64 b)->Matrix {
         Matrix res;
         for(int i = 1; i <= 2; ++i){
             for(int j = 1; j <= 2; ++j){
