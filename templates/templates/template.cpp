@@ -17,7 +17,10 @@ int main(){
 
   int T = 1;
   // std::cin >> T;
-  for(; T--;){
+
+  for(int Ti = 0; Ti < T; Ti++){
     solve();
   }
+
+  return 0;
 }
