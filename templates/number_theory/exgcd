@@ -1,4 +1,4 @@
-auto exgcd = [&](auto &&self,int a,int b,int &x,int &y)->int{
+auto exgcd = [&](auto &&self,int a,int b,int &x,int &y)->int {
     if(b==0){
         x = 1,y = 0;
         return a;

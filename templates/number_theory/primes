@@ -1,62 +1,66 @@
 /**   欧拉筛
  *    2023-11-14: https://qoj.ac/submission/251234
 **/
+// minp[i]: 数字i的最小质因数
+// primes: 存储所有已发现的质数
 std::vector<int> minp, primes;
 
 void sieve(int n) {
-    minp.assign(n + 1, 0);
-    primes.clear();
-    
-    for (int i = 2; i <= n; i++) {
-        if (minp[i] == 0) {
-            minp[i] = i;
-            primes.push_back(i);
-        }
-        
-        for (auto p : primes) {
-            if (i * p > n) {
-                break;
-            }
-            minp[i * p] = p;
-            if (p == minp[i]) {
-                break;
-            }
-        }
+  minp.assign(n + 1,
+              0);  // 初始所有数的最小质因数为0（表示未处理）
+  primes.clear();         // 清空质数列表
+
+  for (int i = 2; i <= n; i++) {
+    if (minp[i] == 0) {          // i是质数
+      minp[i] = i;            // 质数的最小质因数是它自己
+      primes.push_back(i);    // 加入质数列表
     }
+
+    // 用当前数i去乘已发现的质数
+    for (auto p : primes) {
+      if (i * p > n) {   // 超出范围则终止
+        break;
+      }
+      minp[i * p] = p;        // 标记i*p的最小质因数是p
+      if (p == minp[i]) {// 关键：如果p是i的最小质因数，则跳出循环
+        break;
+      }
+    }
+  }
 }
 
 bool isprime(int n) {
-    return minp[n] == n;
+  return minp[n] == n;
 }
 
 /**   欧拉筛
  *    2023-03-22: https://yukicoder.me/submissions/851524
 **/
 void sieve(int n) {
-    minp.assign(n + 1, 0);
-    phi.assign(n + 1, 0);
-    primes.clear();
-    
-    for (int i = 2; i <= n; i++) {
-        if (minp[i] == 0) {
-            minp[i] = i;
-            phi[i] = i - 1;
-            primes.push_back(i);
-        }
-        
-        for (auto p : primes) {
-            if (i * p > n) {
-                break;
-            }
-            minp[i * p] = p;
-            if (p == minp[i]) {
-                phi[i * p] = phi[i] * p;
-                break;
-            }
-            phi[i * p] = phi[i] * (p - 1);
-        }
+  minp.assign(n + 1, 0);
+  phi.assign(n + 1, 0);
+  primes.clear();
+
+  for (int i = 2; i <= n; i++) {
+    if (minp[i] == 0) {
+      minp[i] = i;
+      phi[i] = i - 1;
+      primes.push_back(i);
     }
-    for (int i = 2; i <= n; i++) {
-        phi[i] += phi[i - 1];
+
+    for (auto p : primes) {
+      if (i * p > n) {
+        break;
+      }
+      minp[i * p] = p;
+      if (p == minp[i]) {
+        phi[i * p] = phi[i] * p;
+        break;
+      }
+      phi[i * p] = phi[i] * (p - 1);
     }
+  }
+  for (int i = 2; i <= n; i++) {
+    phi[i] += phi[i - 1];
+  }
 }
