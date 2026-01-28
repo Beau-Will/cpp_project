@@ -1,0 +1,91 @@
+/**   欧拉筛
+ *    2023-11-14: https://qoj.ac/submission/251234
+ *    筛质数
+**/
+std::vector<int> minp, primes;
+
+void sieve(int n) {
+  minp.assign(n + 1, 0);
+  primes.clear();
+
+  for (int i = 2; i <= n; i++) {
+    if (minp[i] == 0) {
+      minp[i] = i;
+      primes.push_back(i);
+    }
+
+    for (auto p : primes) {
+      if (i * p > n) {
+        break;
+      }
+      minp[i * p] = p;
+      if (p == minp[i]) {
+        break;
+      }
+    }
+  }
+}
+
+bool isprime(int n) {
+  return minp[n] == n;
+}
+
+/**   欧拉筛
+ *    2023-03-22: https://yukicoder.me/submissions/851524
+ *    筛质数和欧拉函数
+ *    phi[i]存的是欧拉函数前缀和
+**/
+std::vector<int> minp, primes;
+std::vector<i64> phi;
+
+void sieve(int n) {
+  minp.assign(n + 1, 0);
+  phi.assign(n + 1, 0);
+  primes.clear();
+
+  phi[1] = 1;
+  for (int i = 2; i <= n; i++) {
+    if (minp[i] == 0) {
+      minp[i] = i;
+      phi[i] = i - 1;
+      primes.push_back(i);
+    }
+
+    for (auto p : primes) {
+      if (i * p > n) {
+        break;
+      }
+      minp[i * p] = p;
+      if (p == minp[i]) {
+        phi[i * p] = phi[i] * p;
+        break;
+      }
+      phi[i * p] = phi[i] * (p - 1);
+    }
+  }
+  
+  std::partial_sum(phi.begin(),phi.end(),phi.begin());
+}
+
+bool isprime(int n) {
+  return minp[n] == n;
+}
+
+/**   欧拉函数（求解单个数的欧拉函数）
+ *    2023-10-09: https://atcoder.jp/contests/tenka1-2017/submissions/46411797
+**/
+int phi(int n) {
+  int res = n;
+  for (int i = 2; i * i <= n; i++) {
+    if (n % i == 0) {
+      while (n % i == 0) {
+        n /= i;
+      }
+      res = res / i * (i - 1);
+    }
+  }
+  if (n > 1) {
+    res = res / n * (n - 1);
+  }
+  return res;
+}
