@@ -1,3 +1,8 @@
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <algorithm>
+
 /**
  * Kosaraju算法求强连通分量和缩点 (1-based版本)
  *
@@ -87,4 +92,52 @@ std::vector<int> scc_size_1based(const std::vector<int>& scc_id, int n, int scc_
     size[scc_id[i]]++;
   }
   return size;
+}
+
+int main(){
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  std::cout.tie(nullptr);
+
+  int n;
+  std::cin >> n;
+
+  std::vector<std::pair<int,int>> edges;
+  for(int u = 1; u <= n; u++){
+    int v;
+    while(std::cin >> v){
+      if(v == 0){
+        break;
+      }
+      edges.push_back({u,v});
+    }
+  }
+
+  auto [scc_id, scc_cnt, scc_adj] = kosaraju_scc_1based(n, edges);
+  auto scc_siz = scc_size_1based(scc_id, n, scc_cnt);
+
+  std::vector<int> in(scc_cnt + 1), out(scc_cnt + 1);
+  for(int u = 1; u <= scc_cnt; u++){
+    out[u] = scc_adj[u].size();
+    for(const auto& v : scc_adj[u]){
+      in[v]++;
+    }
+  }
+
+  int in0 = 0, out0 = 0;
+  for(int u = 1; u <= scc_cnt; u++){
+    if(in[u] == 0){
+      in0++;
+    }
+    if(out[u] == 0){
+      out0++;
+    }
+  }
+
+  std::cout << in0 << "\n";
+  if(scc_cnt == 1){
+    std::cout << "0\n";
+  }else{
+    std::cout << std::max(in0, out0) << "\n";
+  }
 }

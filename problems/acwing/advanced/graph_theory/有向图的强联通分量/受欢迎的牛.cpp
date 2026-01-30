@@ -1,3 +1,8 @@
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <algorithm>
+
 /**
  * Kosaraju算法求强连通分量和缩点 (1-based版本)
  *
@@ -87,4 +92,41 @@ std::vector<int> scc_size_1based(const std::vector<int>& scc_id, int n, int scc_
     size[scc_id[i]]++;
   }
   return size;
+}
+
+int main(){
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  std::cout.tie(nullptr);
+  
+  int n, m;
+  std::cin >> n >> m;
+  
+  std::vector<std::pair<int,int>> edges(m);
+  for(int i = 0; i < m; i++){
+    auto& [u, v] = edges[i];
+    std::cin >> u >> v;
+  }
+  
+  auto [scc_id, scc_cnt, scc_adj] = kosaraju_scc_1based(n, edges);
+  auto scc_siz = scc_size_1based(scc_id, n, scc_cnt);
+
+  std::vector<int> out(scc_cnt + 1);
+  for(int i = 1; i <= scc_cnt; i++){
+    out[i] = scc_adj[i].size();
+  }
+
+  std::vector<int> out0;
+  for(int i = 1; i <= scc_cnt; i++){
+    if(out[i] == 0){
+      out0.push_back(i);
+    }
+  }
+
+  int ans = 0;
+  if(out0.size() == 1){
+    ans = scc_siz[out0.front()];
+  }
+
+  std::cout << ans << "\n";
 }
