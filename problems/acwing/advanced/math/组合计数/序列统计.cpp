@@ -1,3 +1,11 @@
+#include <bits/stdc++.h>
+
+using i64 = long long;
+
+constexpr int inf1 = 1E9;
+constexpr i64 inf2 = 1E18;
+constexpr int P1 = 1E9+7, P2 = 998'244'353;
+
 /**
  *    自动取模类
  *    一般定义模数为P
@@ -196,4 +204,26 @@ Z Lucas(T n, T m) {
     comb.init(P - 1);
   }
   return comb.binom(n % P, m % P) * Lucas(n / P, m / P);
+}
+
+void solve(){
+  int n, l, r;
+  std::cin >> n >> l >> r;
+
+  std::cout << Lucas(r - l + n + 1, r - l + 1) - 1 << "\n";
+}
+
+int main(){
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  std::cout.tie(nullptr);
+
+  int T = 1;
+  std::cin >> T;
+
+  for(int Ti = 0; Ti < T; Ti++){
+    solve();
+  }
+
+  return 0;
 }

@@ -1,8 +1,11 @@
-/**
- *    自动取模类
- *    一般定义模数为P
- *    P必须为质数，否则不满足费马小定理，在处理逆元时会出错
-**/
+#include <bits/stdc++.h>
+
+using i64 = long long;
+
+constexpr int inf1 = 1E9;
+constexpr i64 inf2 = 1E18;
+constexpr int P1 = 1E9+7, P2 = 998'244'353;
+
 template<class T>
 constexpr T power(T a, i64 b) {
   T res = 1;
@@ -107,30 +110,15 @@ struct MInt {
   }
 };
 
-/**
- *    模板全特化
- *    使用动态模数（运行时确定）
- *    using Z2 = MInt<0>;       // 模数在运行时设置
- *    Z2::setMod(1000000007);   // 重新设置模数为1000000007
-**/
 template<>
 int MInt<0>::Mod = 998244353;
 
-/**
- *    用于编译期就计算好逆元，可以用于不同的模数
- *    如求2在模数1000000007下的逆元
- *    constexpr auto inv2 = CInv<2, 1000000007>;
-**/
 template<int V, int P>
 constexpr MInt<P> CInv = MInt<P>(V).inv();
 
-constexpr int P = 1000000007;
+constexpr int P = 100003;
 using Z = MInt<P>;
 
-/**
- *    组合数
- *    需要搭配自动取模类Z一起食用
-**/
 struct Comb {
   int n;
   std::vector<Z> _fac;
@@ -181,19 +169,30 @@ struct Comb {
   }
 } comb;
 
-/**   
- *    Lucas定理求组合数C(n, m)
- *    当模数P较小时且n和m一般较大时采用
- *    P < 1E7级别, 1E7 < n,m < ((static_cast<__int128(1) << 127) - 1)
- *    P要求为质数
-**/
-template<typename T>
-Z Lucas(T n, T m) {
-  if (m < 0 || m > n) return 0;
-  if (m == 0) return 1;
-  
-  if (comb.n < P - 1) {
-    comb.init(P - 1);
+void solve(){
+  int a, b, c, d, k;
+  std::cin >> a >> b >> c >> d >> k;
+
+  Z ans = 0;
+  for(int i = 0; i <= k; i++) {
+    int j = k - i;
+    ans += comb.binom(b, i) * comb.permu(a, i) * comb.binom(d, j) * comb.permu(a + c - i, j);
   }
-  return comb.binom(n % P, m % P) * Lucas(n / P, m / P);
+
+  std::cout << ans << "\n";
+}
+
+int main(){
+  std::ios::sync_with_stdio(false);
+  std::cin.tie(nullptr);
+  std::cout.tie(nullptr);
+
+  int T = 1;
+  // std::cin >> T;
+
+  for(int Ti = 0; Ti < T; Ti++){
+    solve();
+  }
+
+  return 0;
 }
