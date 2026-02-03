@@ -1,0 +1,97 @@
+struct DSU {
+  int _n;
+  std::vector<int> _fa, _size;
+  DSU() {}
+  DSU(int n) {
+    init(n);
+  }
+  void init(int n) {
+    _fa.resize(n);
+    std::iota(_fa.begin(), _fa.end(), 0);
+    _size.assign(n, 1);
+  }
+  int find(int x) {
+    if (x != _fa[x]) {
+      _fa[x] = find(_fa[x]);
+    }
+    return _fa[x];
+  }
+  bool same(int x, int y) {
+    return find(x) == find(y);
+  }
+  bool merge(int x, int y) {
+    int fx = find(x);
+    int fy = find(y);
+    if (fx != fy) {
+      if (_size[fx] < _size[fy]) {
+        std::swap(fx, fy);
+      }
+      _size[fx] += _size[fy];
+      _fa[fy] = fx;
+      return true;
+    }
+    return false;
+  }
+};
+
+/**
+ * Kruskal算法（适合稀疏图）
+ * @param n 节点数（1-indexed）
+ * @param edges 边列表，每个元素是(u, v, w)
+ * @return 最小生成树的总权重，如果图不连通返回-1
+ */
+template<class T = int, typename RT = i64>
+RT kruskal(int n, std::vector<std::tuple<int, int, T>>& edges) {
+  // 按边权从小到大排序
+  std::sort(edges.begin(), edges.end(),
+  [](const auto & a, const auto & b) {
+    return std::get<2>(a) < std::get<2>(b);
+  });
+
+  DSU dsu(n + 1);
+  RT res = 0;
+  int cnt = 0;
+  int m = edges.size();
+
+  for (int i = 0; i < m && cnt < n - 1; i++) {
+    const auto& [u, v, w] = edges[i];
+    if (dsu.merge(u, v)) {
+      res += w;
+      cnt++;
+    }
+  }
+
+  return cnt == n - 1 ? res : -1;
+}
+
+// 可选：带MST边收集的版本
+template<class T = int, typename RT = i64>
+std::pair<RT, std::vector<std::tuple<int, int, T>>>
+kruskal_with_mst(int n, std::vector<std::tuple<int, int, T>>& edges) {
+  std::sort(edges.begin(), edges.end(),
+  [](const auto & a, const auto & b) {
+    return std::get<2>(a) < std::get<2>(b);
+  });
+
+  DSU dsu(n + 1);
+  RT res = 0;
+  int cnt = 0;
+  int m = (int)edges.size();
+  std::vector<std::tuple<int, int, T>> mst_edges;
+  mst_edges.reserve(n - 1);
+
+  for (int i = 0; i < m && cnt < n - 1; i++) {
+    const auto& [u, v, w] = edges[i];
+    if (dsu.merge(u, v)) {
+      res += w;
+      cnt++;
+      mst_edges.emplace_back(u, v, w);
+    }
+  }
+
+  if (cnt != n - 1) {
+    return {-1, {}};
+  }
+
+  return {res, mst_edges};
+}

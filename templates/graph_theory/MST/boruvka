@@ -1,0 +1,213 @@
+struct DSU {
+  int _n;
+  std::vector<int> _fa, _size;
+  DSU() {}
+  DSU(int n) {
+    init(n);
+  }
+  void init(int n) {
+    _fa.resize(n);
+    std::iota(_fa.begin(), _fa.end(), 0);
+    _size.assign(n, 1);
+  }
+  int find(int x) {
+    if (x != _fa[x]) {
+      _fa[x] = find(_fa[x]);
+    }
+    return _fa[x];
+  }
+  bool same(int x, int y) {
+    return find(x) == find(y);
+  }
+  bool merge(int x, int y) {
+    int fx = find(x);
+    int fy = find(y);
+    if (fx != fy) {
+      _size[fx] += _size[fy];
+      _fa[fy] = fx;
+      return true;
+    }
+    return false;
+  }
+};
+
+/**
+ * Boruvka算法 - 边表版本
+ * @tparam WeightT 边权类型，默认int
+ * @tparam ResultT 结果类型，默认long long
+ * @param n 节点数（1-indexed）
+ * @param edges 边列表，每个元素是(u, v, w)
+ * @param INF 表示不连通的特殊值，默认-1（要求ResultT为有符号类型）
+ * @return 最小生成树的总权重，如果图不连通返回INF
+ */
+template<class WeightT = int, class ResultT = i64>
+ResultT boruvka(int n, const std::vector<std::tuple<int, int, WeightT>>& edges,
+                ResultT INF = -1) {
+  DSU dsu(n + 1);  // 节点从1开始
+  ResultT res = 0;
+  int components = n, m = (int)edges.size();
+
+  // 预处理：构建边列表的引用数组，避免频繁解包
+  std::vector<int> u_ref(m), v_ref(m);
+  std::vector<WeightT> w_ref(m);
+  for (int i = 0; i < m; i++) {
+    const auto& [u, v, w] = edges[i];
+    u_ref[i] = u;
+    v_ref[i] = v;
+    w_ref[i] = w;
+  }
+
+  while (components > 1) {
+    // best[comp] = {min_weight, edge_index, to_component}
+    std::vector<std::tuple<ResultT, int, int>> best;
+    best.reserve(n + 1);
+    best.emplace_back(0, -1, -1);  // 占位，使下标对齐到1
+
+    for (int i = 1; i <= n; i++) {
+      best.emplace_back(std::numeric_limits<ResultT>::max(), -1, -1);
+    }
+
+    bool found_edge = false;
+    // 遍历所有边
+    for (int i = 0; i < m; i++) {
+      int u = u_ref[i], v = v_ref[i];
+      WeightT w = w_ref[i];
+      int fu = dsu.find(u);
+      int fv = dsu.find(v);
+
+      if (fu != fv) {
+        found_edge = true;
+        // 更新fu的最小边
+        auto& [w1, idx1, fc1] = best[fu];
+        if (ResultT(w) < w1) {
+          w1 = ResultT(w);
+          idx1 = i;
+          fc1 = fv;
+        }
+
+        // 更新fv的最小边
+        auto& [w2, idx2, fc2] = best[fv];
+        if (ResultT(w) < w2) {
+          w2 = ResultT(w);
+          idx2 = i;
+          fc2 = fu;
+        }
+      }
+    }
+
+    // 如果没有找到任何连接不同分量的边，图不连通
+    if (!found_edge && components > 1) {
+      return INF;
+    }
+
+    bool merged = false;
+    std::vector<bool> used(m, false);
+
+    // 添加找到的最小边并合并分量
+    for (int i = 1; i <= n; i++) {
+      const auto& [_, idx, fc] = best[i];
+      if (idx != -1 && !used[idx]) {
+        int u = u_ref[idx], v = v_ref[idx];
+        WeightT w = w_ref[idx];
+
+        if (dsu.merge(u, v)) {
+          res += w;
+          components--;
+          merged = true;
+          used[idx] = true;
+        }
+      }
+    }
+
+    // 如果没有合并任何分量，说明图不连通
+    if (!merged && components > 1) {
+      return INF;
+    }
+  }
+
+  return res;
+}
+
+/*
+*   带收集MST版本
+**/
+template<class WeightT = int, class ResultT = i64>
+std::pair<ResultT, std::vector<std::tuple<int, int, WeightT>>>
+boruvka_with_mst(int n, const std::vector<std::tuple<int, int, WeightT>>& edges,
+                 ResultT INF = -1) {
+  DSU dsu(n + 1);
+  ResultT res = 0;
+  int components = n, m = (int)edges.size();
+  std::vector<std::tuple<int, int, WeightT>> mst_edges;
+  mst_edges.reserve(n - 1);
+
+  // 预处理边
+  std::vector<int> u_ref(m), v_ref(m);
+  std::vector<WeightT> w_ref(m);
+  for (int i = 0; i < m; i++) {
+    const auto& [u, v, w] = edges[i];
+    u_ref[i] = u;
+    v_ref[i] = v;
+    w_ref[i] = w;
+  }
+
+  while (components > 1) {
+    std::vector<std::tuple<ResultT, int, int>> best(n + 1,
+    {std::numeric_limits<ResultT>::max(), -1, -1});
+
+    bool found_edge = false;
+    for (int i = 0; i < m; i++) {
+      int u = u_ref[i], v = v_ref[i];
+      WeightT w = w_ref[i];
+      int fu = dsu.find(u);
+      int fv = dsu.find(v);
+
+      if (fu != fv) {
+        found_edge = true;
+        auto& [w1, idx1, fc1] = best[fu];
+        auto& [w2, idx2, fc2] = best[fv];
+        ResultT rw = ResultT(w);
+
+        if (rw < w1) {
+          w1 = rw;
+          idx1 = i;
+          fc1 = fv;
+        }
+        if (rw < w2) {
+          w2 = rw;
+          idx2 = i;
+          fc2 = fu;
+        }
+      }
+    }
+
+    if (!found_edge && components > 1) {
+      return {INF, {}};
+    }
+
+    bool merged = false;
+    std::vector<bool> edge_used(m, false);
+
+    for (int i = 1; i <= n; i++) {
+      const auto& [_, idx, fc] = best[i];
+      if (idx != -1 && !edge_used[idx]) {
+        int u = u_ref[idx], v = v_ref[idx];
+        WeightT w = w_ref[idx];
+
+        if (dsu.merge(u, v)) {
+          res += w;
+          components--;
+          merged = true;
+          edge_used[idx] = true;
+          mst_edges.emplace_back(u, v, w);
+        }
+      }
+    }
+
+    if (!merged && components > 1) {
+      return {INF, {}};
+    }
+  }
+
+  return {res, mst_edges};
+}

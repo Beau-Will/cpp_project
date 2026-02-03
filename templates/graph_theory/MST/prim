@@ -1,0 +1,89 @@
+constexpr int inf = std::numeric_limits<int>::max();
+
+/**
+ * Prim算法 - 邻接矩阵版本（适合稠密图）
+ * @param n 节点数（1-indexed）
+ * @param g 邻接矩阵，g[u][v] = w，如果没有边则为inf
+ * @return 最小生成树的总权重，如果图不连通返回-1
+ */
+template<class T = int, typename RT = i64>
+RT prim_matrix(int n, const std::vector<std::vector<T>>& g) {
+  if (n == 0) return 0;
+
+  std::vector<T> min_cost(n + 1, inf);  // 到MST的最小距离
+  std::vector<bool> in_mst(n + 1, false);  // 是否在MST中
+
+  // 从节点1开始
+  min_cost[1] = 0;
+  RT res = 0;
+  int cnt = 0;
+
+  for (int i = 1; i <= n; i++) {
+    // 找到不在MST中且min_cost最小的节点
+    int u = -1;
+    T min_val = inf;
+    for (int v = 1; v <= n; v++) {
+      if (!in_mst[v] && min_cost[v] < min_val) {
+        min_val = min_cost[v];
+        u = v;
+      }
+    }
+
+    // 如果没有找到合适的节点，说明图不连通
+    if (u == -1) return -1;
+
+    in_mst[u] = true;
+    res += min_val;
+    cnt++;
+
+    // 更新与新加入节点相邻的节点的min_cost
+    for (int v = 1; v <= n; v++) {
+      if (!in_mst[v] && g[u][v] < min_cost[v]) {
+        min_cost[v] = g[u][v];
+      }
+    }
+  }
+
+  return cnt == n ? res : -1;
+}
+
+/**
+ * Prim算法 - 堆优化版本（适合稀疏图）
+ * @param n 节点数（1-indexed）
+ * @param adj 邻接表，adj[u] = vector<pair<v, w>>
+ * @return 最小生成树的总权重，如果图不连通返回-1
+ */
+template<class T = int, typename RT = i64>
+RT prim_heap(int n, const std::vector<std::vector<std::pair<int, T>>>& adj) {
+  if (n == 0) return 0;
+
+  std::vector<bool> in_mst(n + 1, false);
+  // 使用小顶堆存储{weight, vertex}
+  using P = std::pair<T, int>;
+  std::priority_queue<P, std::vector<P>, std::greater<P>> pq;
+
+  // 从节点1开始
+  pq.emplace(0, 1);
+  RT res = 0;
+  int cnt = 0;
+
+  while (!pq.empty() && cnt < n) {
+    auto [w, u] = pq.top();
+    pq.pop();
+
+    if (in_mst[u]) continue;
+
+    in_mst[u] = true;
+    res += w;
+    cnt++;
+
+    // 遍历u的所有邻接边
+    for (const auto& [v, weight] : adj[u]) {
+      if (!in_mst[v]) {
+        pq.emplace(weight, v);
+      }
+    }
+  }
+
+  return cnt == n ? res : -1;
+}
