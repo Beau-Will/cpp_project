@@ -1,0 +1,116 @@
+/**
+ *  Targan求LCA
+**/
+struct DSU {
+  int _n;
+  std::vector<int> _fa, _size;
+  DSU() {}
+  DSU(int n) {
+    init(n);
+  }
+  void init(int n) {
+    _fa.resize(n);
+    std::iota(_fa.begin(), _fa.end(), 0);
+    _size.assign(n, 1);
+  }
+  int find(int x) {
+    if (x != _fa[x]) {
+      _fa[x] = find(_fa[x]);
+    }
+    return _fa[x];
+  }
+  bool same(int x, int y) {
+    return find(x) == find(y);
+  }
+  bool merge(int x, int y) {
+    int fx = find(x);
+    int fy = find(y);
+    if (fx != fy) {
+      _size[fx] += _size[fy];
+      _fa[fy] = fx;
+      return true;
+    }
+    return false;
+  }
+};
+
+/**
+ *  若只求LCA，无边权
+**/
+int rt = 1;
+std::vector<int> dep(n + 1);
+dep[rt] = 1;
+
+std::function<void(int, int)> dfs = [&](int u, int fa){
+  for(const auto& v : adj[u]){
+    if(v == fa){
+      continue;
+    }
+    dep[v] = dep[u] + 1;
+    dfs(v, u);
+  }
+};
+
+dfs(rt, -1);
+
+std::vector<int> st(n + 1);
+std::vector<int> ans(m);
+std::vector<std::pair<int, int>> querys(m);
+//querys[u] = {v, id};
+std::function<void(int)> tarjan = [&](int u){
+  st[u] = 1;
+  for(const auto& v : adj[u]){
+    if(!st[v]){
+      tarjan(v);
+      dsu.merge(u, v);
+    }
+  }
+  for(const auto& [v, id] : querys[u]){
+    if(st[v] == 2){
+      int lca = dsu.find(v);
+      ans[id] = lca;
+    }
+  }
+  st[u] = 2;
+};
+
+/**
+ *  求dist(u, v)，u和v有边权w
+**/
+int rt = 1;
+std::vector<int> dep(n + 1), dist(n + 1);
+dep[rt] = 1;
+
+std::function<void(int, int)> dfs = [&](int u, int fa){
+  for(const auto& [v, w] : adj[u]){
+    if(v == fa){
+      continue;
+    }
+    dep[v] = dep[u] + 1;
+    dist[v] = dist[u] + w;
+    dfs(v, u);
+  }
+};
+
+dfs(rt, -1);
+
+std::vector<int> st(n + 1);
+std::vector<int> ans(m);
+std::vector<std::pair<int, int>> querys(m);
+//querys[u] = {v, id};
+std::function<void(int)> tarjan = [&](int u){
+  st[u] = 1;
+  for(const auto& [v, w] : adj[u]){
+    if(!st[v]){
+      tarjan(v);
+      dsu.merge(u, v);
+    }
+  }
+  for(const auto& [v, id] : querys[u]){
+    if(st[v] == 2){
+      int lca = dsu.find(v);
+      ans[id] = dist[u] + dist[v] - dist[lca] * 2;
+    }
+  }
+  st[u] = 2;
+};
