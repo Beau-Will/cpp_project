@@ -1,0 +1,56 @@
+template<typename T, typename Func>
+struct SparseTable {
+  int _n, _log;
+  std::vector<std::vector<T>> _f;
+
+  constexpr explicit SparseTable(const std::vector<T>& init) {
+    build(init);
+  }
+
+  void build(const std::vector<T>& init) {
+    _n = static_cast<int>(init.size());
+    if (_n == 0) return;
+
+    _log = 32 - __builtin_clz(_n);
+    _f.assign(_n, std::vector<T>(_log));
+
+    for (int i = 0; i < _n; ++i) {
+      _f[i][0] = init[i];
+    }
+
+    for (int j = 1; j < _log; ++j) {
+      int step = 1 << (j - 1);
+      for (int i = 0; i + (1 << j) <= _n; ++i) {
+        _f[i][j] = Func{}(_f[i][j - 1], _f[i + step][j - 1]);
+      }
+    }
+  }
+
+  T query(int l, int r) const {
+    if (l > r) std::swap(l, r);
+    int t = 31 - __builtin_clz(r - l + 1);
+    return Func{}(_f[l][t], _f[r - (1 << t) + 1][t]);
+  }
+};
+
+// 定义操作结构体
+struct MaxOp {
+  template<typename T>
+  constexpr T operator()(const T& a, const T& b) const {
+    return a > b ? a : b;
+  }
+};
+
+struct MinOp {
+  template<typename T>
+  constexpr T operator()(const T& a, const T& b) const {
+    return a < b ? a : b;
+  }
+};
+
+struct GcdOp {
+  template<typename T>
+  constexpr T operator()(const T& a, const T& b) const {
+    return std::gcd(a, b);
+  }
+};
