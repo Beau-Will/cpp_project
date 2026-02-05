@@ -219,3 +219,225 @@ struct Info {
 Info operator+(const Info& a, const Info& b) {
   return {std::max(a.x, b.x)};
 }
+
+/*
+ * 修改后的懒标记线段树是1-based的，用于构造的init_数组也是1-based
+ * 区间查询和区间修改的区间[l,r]皆为左闭右闭，为1-based
+ */
+template<class Info, class Tag>
+struct LazySegmentTree {
+  int n;
+  std::vector<Info> info;
+  std::vector<Tag> tag;
+  LazySegmentTree() : n(0) {}
+  LazySegmentTree(int n_, Info v_ = Info()) {
+    init(n_, v_);
+  }
+  template<class T>
+  LazySegmentTree(std::vector<T> init_) {
+    init(init_);
+  }
+  void init(int n_, Info v_ = Info()) {
+    init(std::vector<Info>(n_ + 1, v_));
+  }
+  template<class T>
+  void init(std::vector<T> init_) {
+    n = init_.size() - 1;
+    info.assign(4 * (n + 5), Info());
+    tag.assign(4 * (n + 5), Tag());
+    std::function<void(int, int, int)> build = [&](int p, int l, int r) {
+      if (l == r) {
+        info[p] = init_[l];
+        return;
+      }
+      int m = (l + r) / 2;
+      build(p * 2, l, m);
+      build(p * 2 + 1, m + 1, r);
+      pull(p);
+    };
+    build(1, 1, n);
+  }
+  void pull(int p) {
+    info[p] = info[p * 2] + info[p * 2 + 1];
+  }
+  void apply(int p, const Tag& v) {
+    info[p].apply(v);
+    tag[p].apply(v);
+  }
+  void push(int p) {
+    apply(p * 2, tag[p]);
+    apply(p * 2 + 1, tag[p]);
+    tag[p] = Tag();
+  }
+  void modify(int p, int l, int r, int x, const Info& v) {
+    if (l == r) {
+      info[p] = v;
+      return;
+    }
+    int m = (l + r) / 2;
+    push(p);
+    if (x <= m) {
+      modify(p * 2, l, m, x, v);
+    } else {
+      modify(p * 2 + 1, m + 1, r, x, v);
+    }
+    pull(p);
+  }
+  void modify(int x, const Info& v) {
+    modify(1, 1, n, x, v);
+  }
+  Info rangeQuery(int p, int l, int r, int x, int y) {
+    if (l > y || r < x) {
+      return Info();
+    }
+    if (l >= x && r <= y) {
+      return info[p];
+    }
+    int m = (l + r) / 2;
+    push(p);
+    return rangeQuery(p * 2, l, m, x, y) + rangeQuery(p * 2 + 1, m + 1, r, x, y);  // 修改：右子区间从m+1开始
+  }
+  Info rangeQuery(int l, int r) {
+    return rangeQuery(1, 1, n, l, r);
+  }
+  void rangeApply(int p, int l, int r, int x, int y, const Tag& v) {
+    if (l > y || r < x) {
+      return;
+    }
+    if (l >= x && r <= y) {
+      apply(p, v);
+      return;
+    }
+    int m = (l + r) / 2;
+    push(p);
+    rangeApply(p * 2, l, m, x, y, v);
+    rangeApply(p * 2 + 1, m + 1, r, x, y, v);
+    pull(p);
+  }
+  void rangeApply(int l, int r, const Tag& v) {
+    return rangeApply(1, 1, n, l, r, v);
+  }
+  void half(int p, int l, int r) {
+    if (info[p].act == 0) {
+      return;
+    }
+    if ((info[p].min + 1) / 2 == (info[p].max + 1) / 2) {
+      apply(p, {-(info[p].min + 1) / 2});
+      return;
+    }
+    int m = (l + r) / 2;
+    push(p);
+    half(p * 2, l, m);
+    half(p * 2 + 1, m + 1, r);
+    pull(p);
+  }
+  void half() {
+    half(1, 1, n);
+  }
+
+  template<class F>
+  int findFirst(int p, int l, int r, int x, int y, F&& pred) {
+    if (l > y || r < x) {
+      return -1;
+    }
+    if (l >= x && r <= y && !pred(info[p])) {
+      return -1;
+    }
+    if (l == r) {
+      return l;
+    }
+    int m = (l + r) / 2;
+    push(p);
+    int res = findFirst(p * 2, l, m, x, y, pred);
+    if (res == -1) {
+      res = findFirst(p * 2 + 1, m + 1, r, x, y, pred);
+    }
+    return res;
+  }
+  template<class F>
+  int findFirst(int l, int r, F&& pred) {
+    return findFirst(1, 1, n, l, r, pred);
+  }
+  template<class F>
+  int findLast(int p, int l, int r, int x, int y, F&& pred) {
+    if (l > y || r < x) {
+      return -1;
+    }
+    if (l >= x && r <= y && !pred(info[p])) {
+      return -1;
+    }
+    if (l == r) {
+      return l;
+    }
+    int m = (l + r) / 2;
+    push(p);
+    int res = findLast(p * 2 + 1, m + 1, r, x, y, pred);
+    if (res == -1) {
+      res = findLast(p * 2, l, m, x, y, pred);
+    }
+    return res;
+  }
+  template<class F>
+  int findLast(int l, int r, F&& pred) {
+    return findLast(1, 1, n, l, r, pred);
+  }
+
+  void maintainL(int p, int l, int r, int pre) {
+    if (info[p].difl > 0 && info[p].maxlowl < pre) {
+      return;
+    }
+    if (l == r) {
+      info[p].max = info[p].maxlowl;
+      info[p].maxl = info[p].maxr = l;
+      info[p].maxlowl = info[p].maxlowr = -inf;
+      return;
+    }
+    int m = (l + r) / 2;
+    push(p);
+    maintainL(p * 2, l, m, pre);
+    pre = std::max(pre, info[p * 2].max);
+    maintainL(p * 2 + 1, m + 1, r, pre);
+    pull(p);
+  }
+  void maintainL() {
+    maintainL(1, 1, n, -1);
+  }
+  void maintainR(int p, int l, int r, int suf) {
+    if (info[p].difr > 0 && info[p].maxlowr < suf) {
+      return;
+    }
+    if (l == r) {
+      info[p].max = info[p].maxlowl;
+      info[p].maxl = info[p].maxr = l;
+      info[p].maxlowl = info[p].maxlowr = -inf;
+      return;
+    }
+    int m = (l + r) / 2;
+    push(p);
+    maintainR(p * 2 + 1, m + 1, r, suf);
+    suf = std::max(suf, info[p * 2 + 1].max);
+    maintainR(p * 2, l, m, suf);
+    pull(p);
+  }
+  void maintainR() {
+    maintainR(1, 1, n, -1);
+  }
+};
+
+struct Tag {
+  int x = 0;
+  void apply(const Tag& t)& {
+    x = std::max(x, t.x);
+  }
+};
+
+struct Info {
+  int x = 0;
+  void apply(const Tag& t)& {
+    x = std::max(x, t.x);
+  }
+};
+
+Info operator+(const Info& a, const Info& b) {
+  return {std::max(a.x, b.x)};
+}
