@@ -1,94 +1,145 @@
-//线性基构造（不是最简线性基）
-std::vector<i64> d(63);
-for(int i = 0;i<n;++i){
-	int x = a[i];
-	for(int j = 62;j>=0;--j){
-		if(x&(1LL<<j)){
-			if(d[j]==0){
-				d[j] = x;
-				break;
-			}else{
-				x ^= d[j];
-			}
-		}
-	}
-}
-//化成最简线性基（改造线性基）
-for(int i = 0;i<62;++i){
-	for(int j = i-1;j>=0;--j){
-		if(d[i]&&(1LL<<j)){
-			d[i]^=d[j];
-		}
-	}
-}
-//判断x是否可以由线性基异或得到
-auto check = [&](i64 x){
-	for(int i = 62;i>=0;--i){
-		if(x&(1LL<<i)){
-			if(d[i]==0){
-				return false;
-			}else{
-				x ^= d[i];
-			}
-		}
-	}
-	return x==0;
-};
-//求异或最大值
-i64 ans = 0;
-for(int i = 62;i>=0;--i){
-	if((ans&(1LL<<i))==0&&d[i]){
-		ans ^= d[i];
-	}
-}
-//求异或最小值
-i64 ans = 0;
-int cnt = 0;
-for(int i = 0;i<=62;++i){
-	if(d[i]){
-		++cnt;
-	}
-}
-if(cnt<n){
-	ans = 0;
-}else{
-	for(int i = 0;i<=62;++i){
-		if(d[i]){
-			ans = d[i];
-			break;
-		}
-	}
-}
-//求异或第k小的值
-//必须先将线性基化成最简线性基
-int k;//查询第k小
-i64 ans = 0;
-int cnt = 0;
-for(int i = 0;i<=62;++i){
-	if(d[i]){
-		++cnt;
-	}
-}
+/**
+ *    线性基
+ *    可指定传入数据类型和二进制位数
+ *    支持插入，查询某个数是否能被构造，求异或最大值，求异或最小值，重构为最简线性基，查询异或第k小值 
+**/
+template<typename T = int, int L = 30>
+struct LinearBasis {
+  std::vector<T> f;                   // 基向量
+  std::vector<T> p;                   // 重构后的最简基（仅用于第k小）
+  std::vector<std::vector<int>> comb; // 每个基向量对应的原始下标集合（有序）
+  
+  int cnt = 0;
+  bool has_zero = false;
 
-auto query = [&](){
-	i64 res = 0;
-	for(int i = 0;i<=62;++i){
-		if(((k>>i)&1)&&d[i]){
-			res ^= d[i];
-		}
-	}
-	return res;
-};
+  LinearBasis() {
+    f.resize(L + 1);
+    comb.resize(L + 1);
+  }
 
-if(cnt<n&&k==1){//特殊情况特判
-	ans = 0;
-}else{
-	if(cnt<n){//能产生0，k需要-1
-		--k;
-	}
-	if(max_knum<k){//线性基能产生的最大元素个数小于k
-		ans = -1;
-	}else{
-		ans = query();//一般情况
-	}
-}
+  // 插入元素，不记录下标（适用于不需要构造方案的场景）
+  bool insert(T x) {
+    for (int i = L; i >= 0; --i) {
+      if (!(x >> i & 1)) continue;
+      if (!f[i]) {
+        f[i] = x;
+        cnt++;
+        return true;
+      }
+      x ^= f[i];
+    }
+    has_zero = true;
+    return false;
+  }
+
+  // 插入元素，必须提供其在原数组中的下标 idx (idx >= 0)
+  bool insert(T x, int idx) {
+    assert(idx >= 0);                 // 确保下标有效
+    std::vector<int> cur = {idx};      // 当前元素对应的下标集合
+    for (int i = L; i >= 0; --i) {
+      if (!(x >> i & 1)) continue;
+      if (!f[i]) {
+        f[i] = x;
+        comb[i] = std::move(cur);
+        cnt++;
+        return true;
+      }
+      x ^= f[i];
+      cur = merge(cur, comb[i]);
+    }
+    has_zero = true;
+    return false;                      // 线性相关，未插入新基
+  }
+
+  // 检查 x 是否可以由当前线性基异或得到（不输出方案）
+  bool check(T x) const {
+    for (int i = L; i >= 0; --i) {
+      if (x >> i & 1) {
+        if (!f[i]) return false;
+        x ^= f[i];
+      }
+    }
+    return x == 0;
+  }
+
+  // 求最大异或值
+  T query_max() const {
+    T res = 0;
+    for (int i = L; i >= 0; --i) {
+      res = std::max(res, res ^ f[i]);
+    }
+    return res;
+  }
+
+  // 求最小异或值
+  T query_min() const {
+    if (has_zero) return 0;
+    for (int i = 0; i <= L; ++i) {
+      if (f[i]) return f[i];
+    }
+    return 0;
+  }
+
+  // 重构为最简线性基（同时更新组合信息）
+  void rebuild() {
+    for (int i = L; i >= 0; --i) {
+      if (!f[i]) continue;
+      for (int j = i - 1; j >= 0; --j) {
+        if ((f[i] >> j) & 1) {
+          f[i] ^= f[j];
+          comb[i] = merge(comb[i], comb[j]);
+        }
+      }
+    }
+    p.resize(L + 1);
+    for (int i = 0; i <= L; ++i) {
+      if (f[i]) p.push_back(f[i]);
+    }
+  }
+
+  // 查询第 k 小值（需要先调用 rebuild）
+  T query_kth(i64 k) {
+    if (has_zero) k--;                 // 0 是最小的
+    if (k == 0) return 0;
+    if (k >= (1LL << p.size())) return -1;
+    T res = 0;
+    for (int i = 0; i < p.size(); ++i) {
+      if (k >> i & 1) res ^= p[i];
+    }
+    return res;
+  }
+
+  // 查询构造 x 所需的下标集合，若无法构造则返回空 vector
+  std::vector<int> query_idx(T x) const {
+    if (!check(x)) return {};          // 无法构造
+    if (x == 0) return {};             // 0 由空集构造
+    std::vector<int> cur;
+    T y = x;
+    for (int i = L; i >= 0; --i) {
+      if ((y >> i) & 1) {
+        y ^= f[i];
+        cur = merge(cur, comb[i]);
+      }
+    }
+    return cur;
+  }
+
+  // 合并两个有序下标集合，返回它们的对称差（仍有序）
+  static std::vector<int> merge(const std::vector<int>& a, const std::vector<int>& b) {
+    std::vector<int> res;
+    size_t i = 0, j = 0;
+    while (i < a.size() && j < b.size()) {
+      if (a[i] < b[j]) {
+        res.push_back(a[i++]);
+      } else if (a[i] > b[j]) {
+        res.push_back(b[j++]);
+      } else {
+        ++i;
+        ++j;
+      }
+    }
+    while (i < a.size()) res.push_back(a[i++]);
+    while (j < b.size()) res.push_back(b[j++]);
+    return res;
+  }
+};
